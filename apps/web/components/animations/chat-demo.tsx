@@ -179,7 +179,7 @@ function getReminderPromptText(
   }
 }
 
-function AppIconSquare({ size = 38, borderRadius = 9 }: { size?: number; borderRadius?: number }) {
+function AppIconSquare({ size = 38, borderRadius = 12 }: { size?: number; borderRadius?: number }) {
   const iconSize = Math.round(size * 0.52);
   return (
     <div
@@ -187,14 +187,26 @@ function AppIconSquare({ size = 38, borderRadius = 9 }: { size?: number; borderR
         width: size,
         height: size,
         borderRadius,
-        background: "linear-gradient(145deg, #f5a623 0%, #e8751a 100%)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 10px 22px rgba(232,117,26,0.3)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        border: "0.608px solid rgba(92,92,92,0.4)",
+        background: "linear-gradient(180deg, rgba(228,228,228,0.25) 0%, #B0B0B0 53.5%, #E4E4E4 100%)",
+        padding: 1,
+        boxShadow: "0 19.44px 19.44px -19.44px rgba(0,0,0,0.05), 0 4.86px 4.86px -4.86px rgba(0,0,0,0.1), 0 9.72px 9.72px -9.72px rgba(0,0,0,0.08), inset 0 2px 0 rgba(255,255,255,0.85), inset 0 -2px 0 rgba(0,0,0,0.25)",
         flexShrink: 0,
+        transform: "scaleX(1.044)",
       }}
     >
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: borderRadius * 0.85,
+          background: "linear-gradient(180deg, rgba(228,228,228,0.25) 0%, #B0B0B0 53.5%, #E4E4E4 100%)",
+          boxShadow: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
       <svg width={iconSize} height={iconSize} viewBox="-1 -1 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="19.1" cy="4.9" r="2.3" fill="white"/>
         <circle cx="12" cy="2" r="2.3" fill="white"/>
@@ -204,6 +216,7 @@ function AppIconSquare({ size = 38, borderRadius = 9 }: { size?: number; borderR
         <circle cx="12" cy="22" r="2.3" fill="white"/>
         <circle cx="19.1" cy="19.1" r="2.3" fill="white"/>
       </svg>
+      </div>
     </div>
   );
 }
@@ -219,6 +232,7 @@ function ContactAvatar({ size = 56 }: { size?: number }) {
         background:
           "radial-gradient(circle at 50% 24%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 28%, rgba(0,0,0,0) 52%), #000",
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 24px rgba(0,0,0,0.28)",
+        transform: "scaleX(1.044)",
       }}
     >
       <span
@@ -725,6 +739,7 @@ function IOSCameraView({ flash }: { flash: boolean }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                transform: "scaleX(1.044)",
               }}
             >
               <div
@@ -979,7 +994,7 @@ function LockScreen({ locale, currentDate }: { locale: string; currentDate: Date
         <LiquidGlass
           borderRadius="50%"
           className="flex items-center justify-center"
-          style={{ width: 48, height: 48 }}
+          style={{ width: 48, height: 48, transform: "scaleX(1.044)" }}
         >
           <div className="flex items-center justify-center" style={{ transform: "scale(0.64)" }}>
             <LockFlashlightIcon color="rgba(255,255,255,0.94)" />
@@ -989,7 +1004,7 @@ function LockScreen({ locale, currentDate }: { locale: string; currentDate: Date
         <LiquidGlass
           borderRadius="50%"
           className="flex items-center justify-center"
-          style={{ width: 48, height: 48 }}
+          style={{ width: 48, height: 48, transform: "scaleX(1.044)" }}
         >
           <div className="flex items-center justify-center" style={{ transform: "scale(0.48)" }}>
             <LockCameraIcon color="rgba(255,255,255,0.94)" />
