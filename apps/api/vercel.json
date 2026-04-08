@@ -1,5 +1,6 @@
 {
   "regions": ["iad1", "lhr1", "hnd1"],
   "buildCommand": "cd ../.. && turbo build --filter=@caltext/api",
-  "outputDirectory": ".output"
+  "outputDirectory": ".output",
+  "bunVersion": "1.x"
 }
