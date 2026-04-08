@@ -1,0 +1,30 @@
+{
+  "name": "@caltext/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nitro dev",
+    "build": "nitro build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@caltext/ai": "workspace:*",
+    "@caltext/db": "workspace:*",
+    "@caltext/shared": "workspace:*",
+    "hono": "^4.12.12",
+    "nitro": "^3.0.260311-beta",
+    "rollup": "^4.60.1",
+    "workflow": "^4.2.0",
+    "@workflow/ai": "^4.1.0",
+    "chat": "^4.24.0",
+    "chat-adapter-sendblue": "^0.2.0",
+    "@chat-adapter/state-redis": "^4.24.0",
+    "ai": "^6.0.153",
+    "@ai-sdk/openai": "^3.0.52",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "regions": ["iad1", "lhr1", "hnd1"],
+  "buildCommand": "turbo build --filter=@caltext/api",
+  "outputDirectory": "apps/api/.output",
+  "functions": {
+    "**": {
+      "runtime": "bun@1.x"
+    }
+  }
+}
