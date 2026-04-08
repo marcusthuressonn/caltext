@@ -195,7 +195,7 @@ function AppIconSquare({ size = 38, borderRadius = 9 }: { size?: number; borderR
         flexShrink: 0,
       }}
     >
-      <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width={iconSize} height={iconSize} viewBox="-1 -1 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="19.1" cy="4.9" r="2.3" fill="white"/>
         <circle cx="12" cy="2" r="2.3" fill="white"/>
         <circle cx="4.9" cy="4.9" r="2.3" fill="white"/>
