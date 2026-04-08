@@ -12,8 +12,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@caltext/db": "workspace:*",
-    "@caltext/shared": "workspace:*",
+    "@caltext/db": "*",
+    "@caltext/shared": "*",
     "ai": "^6.0.153",
     "@ai-sdk/openai": "^3.0.52",
     "zod": "^4.3.6"
