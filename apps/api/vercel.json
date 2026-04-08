@@ -1,7 +1,7 @@
 {
   "regions": ["iad1", "lhr1", "hnd1"],
-  "buildCommand": "turbo build --filter=@caltext/api",
-  "outputDirectory": "apps/api/.output",
+  "buildCommand": "cd ../.. && turbo build --filter=@caltext/api",
+  "outputDirectory": ".output",
   "functions": {
     "**": {
       "runtime": "bun@1.x"
