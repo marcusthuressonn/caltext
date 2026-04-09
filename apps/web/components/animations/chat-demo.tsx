@@ -179,34 +179,25 @@ function getReminderPromptText(
   }
 }
 
-function AppIconSquare({ size = 38, borderRadius = 12 }: { size?: number; borderRadius?: number }) {
+function AppIconSquare({ size = 38, borderRadius = 10 }: { size?: number; borderRadius?: number }) {
   const iconSize = Math.round(size * 0.52);
+  /* Silver variant: border: "0.608px solid rgba(60,60,60,0.85)", background: "linear-gradient(180deg, #C2C2C2 0%, #ABABAB 53.5%, #CACACA 100%)", boxShadow with inset shadows */
   return (
     <div
       style={{
         width: size,
         height: size,
         borderRadius,
-        border: "0.608px solid rgba(60,60,60,0.85)",
-        background: "linear-gradient(180deg, #C2C2C2 0%, #ABABAB 53.5%, #CACACA 100%)",
-        padding: 1,
-        boxShadow: "0 19.44px 19.44px -19.44px rgba(0,0,0,0.05), 0 4.86px 4.86px -4.86px rgba(0,0,0,0.1), 0 9.72px 9.72px -9.72px rgba(0,0,0,0.08), inset 0 2px 0 rgba(255,255,255,0.85), inset 0 -2px 0 rgba(0,0,0,0.25)",
+        border: "1px solid rgba(232,117,26,0.2)",
+        background: "linear-gradient(145deg, #f5a623 0%, #e8751a 100%)",
+        boxShadow: "0 8px 18px rgba(232,117,26,0.25)",
         flexShrink: 0,
         transform: "scaleX(1.044)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          borderRadius: borderRadius * 0.85,
-          background: "linear-gradient(180deg, #C2C2C2 0%, #ABABAB 53.5%, #CACACA 100%)",
-          boxShadow: "none",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
       <svg width={iconSize} height={iconSize} viewBox="-1 -1 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="19.1" cy="4.9" r="2.3" fill="white"/>
         <circle cx="12" cy="2" r="2.3" fill="white"/>
@@ -216,7 +207,6 @@ function AppIconSquare({ size = 38, borderRadius = 12 }: { size?: number; border
         <circle cx="12" cy="22" r="2.3" fill="white"/>
         <circle cx="19.1" cy="19.1" r="2.3" fill="white"/>
       </svg>
-      </div>
     </div>
   );
 }
