@@ -1,6 +1,13 @@
-import { getRedis } from "./client.js";
+import { getRedis } from "./client";
 
 const reminderKey = (userId: string) => `reminder:${userId}`;
+const reminderTimesKey = (userId: string) => `reminder_times:${userId}`;
+
+export interface CustomReminderTime {
+  label: string;
+  hour: number;
+  minute: number;
+}
 
 export async function setReminderRunId(userId: string, runId: string): Promise<void> {
   const redis = getRedis();
@@ -15,4 +22,24 @@ export async function getReminderRunId(userId: string): Promise<string | null> {
 export async function deleteReminderRunId(userId: string): Promise<void> {
   const redis = getRedis();
   await redis.del(reminderKey(userId));
+}
+
+export async function setCustomReminderTimes(
+  userId: string,
+  times: CustomReminderTime[],
+): Promise<void> {
+  const redis = getRedis();
+  await redis.set(reminderTimesKey(userId), JSON.stringify(times));
+}
+
+export async function getCustomReminderTimes(userId: string): Promise<CustomReminderTime[] | null> {
+  const redis = getRedis();
+  const raw = await redis.get<string>(reminderTimesKey(userId));
+  if (!raw) return null;
+  return JSON.parse(raw) as CustomReminderTime[];
+}
+
+export async function deleteCustomReminderTimes(userId: string): Promise<void> {
+  const redis = getRedis();
+  await redis.del(reminderTimesKey(userId));
 }

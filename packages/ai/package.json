@@ -9,13 +9,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
     "@caltext/db": "*",
     "@caltext/shared": "*",
     "ai": "^6.0.153",
     "@ai-sdk/openai": "^3.0.52",
+    "date-fns": "^4.1.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

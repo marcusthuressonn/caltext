@@ -22,13 +22,6 @@
     "label": "Get Started in Messages",
     "shortLabel": "Get Started"
   },
-  "TrustBar": {
-    "items": {
-      "freeTrial": "Free Trial",
-      "noApp": "No App Required",
-      "noSignUp": "No Sign-up"
-    }
-  },
   "Features": {
     "heading": "Everything happens in your texts",
     "subtitle": "No app to download. No accounts to create. Just iMessage.",
@@ -70,22 +63,6 @@
       }
     }
   },
-  "HowItWorks": {
-    "heading": "How it works",
-    "subtitle": "Three steps. No downloads. No setup screens.",
-    "step1": {
-      "title": "Text Caltext",
-      "description": "Send a message to get started. Caltext learns your goals, body stats, and preferences in a quick chat."
-    },
-    "step2": {
-      "title": "Log Your Meals",
-      "description": "Text what you ate or snap a photo. AI identifies the food, looks up nutrition, and logs it instantly."
-    },
-    "step3": {
-      "title": "Stay on Track",
-      "description": "Get daily summaries, weekly recaps, streak tracking, and friendly reminders at meal times."
-    }
-  },
   "Faq": {
     "heading": "FAQs",
     "q1": "How does Caltext track my calories?",
@@ -121,6 +98,76 @@
     "msg2": "Nice lunch! 🥗🥑\n\n🍗 Grilled chicken — 285 kcal\n🥑 Avocado — 160 kcal\n🥬 Mixed greens — 25 kcal\n\nTotal: 470 kcal\nToday: 1,240 / 2,100 kcal\n\n860 left — you're on track! 🔥",
     "msg3": "What's my streak?",
     "msg4": "12 days straight! 🔥🔥🔥\nYour longest ever. Keep it going!"
+  },
+  "Privacy": {
+    "heading": "Privacy Policy",
+    "lastUpdated": "Last updated: April 2026",
+    "intro": "Cal Text (\"Caltext\", \"we\", \"us\") is committed to protecting your privacy. This policy explains what data we collect, how we use it, and your rights.",
+    "dataCollection": {
+      "title": "Data We Collect",
+      "body": "When you use Caltext, we collect:\n\n• Your phone number (to identify your account and deliver messages via iMessage)\n• Your name, age, sex, height, and weight (to calculate your personalized calorie target)\n• Meal descriptions and photos you send us\n• Nutrition and calorie data derived from your meals\n• Your timezone and country (detected from your phone number for localization)"
+    },
+    "dataUsage": {
+      "title": "How We Use Your Data",
+      "body": "We use your data to:\n\n• Provide personalized calorie and macro tracking\n• Generate daily summaries, weekly recaps, and meal reminders\n• Improve the accuracy of our food identification and nutrition estimates\n• Communicate with you via iMessage"
+    },
+    "dataStorage": {
+      "title": "Data Storage & Security",
+      "body": "Your phone number is encrypted at rest using AES-256 encryption. All data is stored on secure, access-controlled servers. We use industry-standard security measures to protect your information."
+    },
+    "thirdParty": {
+      "title": "Third-Party Services",
+      "body": "We use the following third-party services to operate Caltext:\n\n• OpenAI — for food identification and natural language processing\n• USDA FoodData Central — for nutrition data lookup\n• Sendblue — for iMessage delivery\n\nThese services process data as necessary to provide our features. We do not sell your data to third parties."
+    },
+    "retention": {
+      "title": "Data Retention",
+      "body": "We retain your meal logs and profile data for as long as your account is active. You can request deletion of your data at any time by contacting us."
+    },
+    "rights": {
+      "title": "Your Rights",
+      "body": "You have the right to:\n\n• Request a copy of your data\n• Request correction of inaccurate data\n• Request deletion of your data\n• Withdraw consent at any time by stopping use of the service"
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "If you have questions about this privacy policy, contact us at privacy@caltext.ai."
+    }
+  },
+  "Terms": {
+    "heading": "Terms of Service",
+    "lastUpdated": "Last updated: April 2026",
+    "intro": "By using Cal Text (\"Caltext\", \"the Service\"), you agree to these terms. Please read them carefully.",
+    "eligibility": {
+      "title": "Eligibility",
+      "body": "You must be at least 16 years old and have access to an iPhone with iMessage to use Caltext."
+    },
+    "service": {
+      "title": "The Service",
+      "body": "Caltext is an AI-powered calorie and nutrition tracking assistant that operates through iMessage. The service includes meal logging, daily summaries, weekly recaps, streak tracking, and meal-time reminders."
+    },
+    "accuracy": {
+      "title": "Nutrition Accuracy",
+      "body": "Caltext provides estimates of calories and macronutrients based on AI analysis and the USDA FoodData Central database. These are estimates and should not be considered exact measurements. Caltext is not a medical device and does not provide medical or dietary advice. Consult a healthcare professional for specific dietary needs."
+    },
+    "account": {
+      "title": "Your Account",
+      "body": "Your account is identified by your phone number. You are responsible for all activity associated with your phone number. Do not share access to your iMessage account with others for the purpose of using Caltext."
+    },
+    "ip": {
+      "title": "Intellectual Property",
+      "body": "All content, features, and functionality of Caltext are owned by Caltext and are protected by copyright and other intellectual property laws."
+    },
+    "liability": {
+      "title": "Limitation of Liability",
+      "body": "Caltext is provided \"as is\" without warranties of any kind. We are not liable for any damages arising from your use of the service, including but not limited to health outcomes based on nutrition estimates provided by the service."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "body": "We may update these terms from time to time. Continued use of Caltext after changes constitutes acceptance of the new terms."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "If you have questions about these terms, contact us at support@caltext.ai."
+    }
   },
   "Footer": {
     "logo": "Cal Text",

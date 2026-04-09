@@ -1,8 +1,8 @@
 import { createPhoneMapping, getOnboardingState, getUser, resolveUserId } from "@caltext/db";
 import { decrypt, detectRegion, generateId } from "@caltext/shared";
 import { start } from "workflow/api";
-import { handleMessage } from "../workflows/handle-message.js";
-import { onboardingWorkflow } from "../workflows/onboarding.js";
+import { handleMessage } from "../workflows/handle-message";
+import { onboardingWorkflow } from "../workflows/onboarding";
 
 export async function routeMessage(
   encryptedPhone: string,
@@ -28,6 +28,10 @@ export async function routeMessage(
 
   const user = await getUser(userId);
   if (!user) return "Something went wrong. Try messaging me again!";
+
+  if (user.onboardingComplete && !user.consentedAt) {
+    return "Your data processing consent has been withdrawn. Message me again if you'd like to start over!";
+  }
 
   if (!user.onboardingComplete) {
     const onboardingState = await getOnboardingState(userId);

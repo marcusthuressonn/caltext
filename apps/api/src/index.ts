@@ -1,8 +1,8 @@
 import { encrypt } from "@caltext/shared";
 import type { Message, Thread } from "chat";
 import { Hono } from "hono";
-import bot from "./bot.js";
-import { routeMessage } from "./router.js";
+import bot from "./bot";
+import { routeMessage } from "./router";
 
 const app = new Hono();
 

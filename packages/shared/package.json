@@ -9,10 +9,13 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.4.1",
     "countries-and-timezones": "^3.8.0",
+    "date-fns": "^4.1.0",
     "libphonenumber-js": "^1"
   },
   "devDependencies": {

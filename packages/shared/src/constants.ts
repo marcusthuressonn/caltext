@@ -8,6 +8,9 @@ export const DAILY_SUMMARY_HOUR = 21;
 export const WEEKLY_RECAP_HOUR = 20;
 export const WEEKLY_RECAP_DAY = "Sunday";
 
+export const DEFAULT_WATER_TARGET_ML = 2500;
+export const CONSENT_VERSION = "2026-04-08";
+
 export const ACTIVITY_MULTIPLIERS: Record<string, number> = {
   sedentary: 1.2,
   light: 1.375,

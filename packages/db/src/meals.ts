@@ -1,5 +1,5 @@
 import type { MealEntry } from "@caltext/shared";
-import { getRedis } from "./client.js";
+import { getRedis } from "./client";
 
 const mealKey = (id: string) => `meal:${id}`;
 const mealsIndexKey = (userId: string, localDate: string) => `meals:${userId}:${localDate}`;
@@ -25,6 +25,47 @@ export async function saveMeal(meal: MealEntry): Promise<void> {
     member: meal.id,
   });
   await pipeline.exec();
+}
+
+export async function getMeal(mealId: string): Promise<MealEntry | null> {
+  const redis = getRedis();
+  const data = await redis.hgetall<Record<string, string>>(mealKey(mealId));
+  if (!data || Object.keys(data).length === 0) return null;
+  return {
+    id: mealId,
+    userId: data.userId ?? "",
+    items: JSON.parse(data.items ?? "[]"),
+    totalCalories: parseInt(data.totalCalories ?? "0", 10),
+    totalProtein: parseFloat(data.totalProtein ?? "0"),
+    totalCarbs: parseFloat(data.totalCarbs ?? "0"),
+    totalFat: parseFloat(data.totalFat ?? "0"),
+    totalFiber: parseFloat(data.totalFiber ?? "0"),
+    photoUrl: data.photoUrl || undefined,
+    source: (data.source as MealEntry["source"]) ?? "text",
+    timestamp: data.timestamp ?? new Date().toISOString(),
+    localDate: data.localDate ?? "",
+  };
+}
+
+export async function deleteMeal(mealId: string, userId: string, localDate: string): Promise<void> {
+  const redis = getRedis();
+  const pipeline = redis.pipeline();
+  pipeline.del(mealKey(mealId));
+  pipeline.zrem(mealsIndexKey(userId, localDate), mealId);
+  await pipeline.exec();
+}
+
+export async function deleteAllMealsForDate(userId: string, localDate: string): Promise<string[]> {
+  const redis = getRedis();
+  const mealIds = await redis.zrange<string[]>(mealsIndexKey(userId, localDate), 0, -1);
+  if (!mealIds || mealIds.length === 0) return [];
+  const pipeline = redis.pipeline();
+  for (const id of mealIds) {
+    pipeline.del(mealKey(id));
+  }
+  pipeline.del(mealsIndexKey(userId, localDate));
+  await pipeline.exec();
+  return mealIds;
 }
 
 export async function getMealsForDate(userId: string, localDate: string): Promise<MealEntry[]> {

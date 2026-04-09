@@ -13,6 +13,8 @@ export interface UserProfile {
   heightCm: number;
   weightKg: number;
   onboardingComplete: boolean;
+  consentedAt: string | null;
+  consentVersion: string | null;
   createdAt: string; // ISO 8601
 }
 
@@ -89,6 +91,16 @@ export interface OnboardingState {
   webhookUrl?: string; // current webhook URL for resuming
 }
 
+export interface WaterLog {
+  totalMl: number;
+  glasses: number; // each glass = 250ml
+}
+
+export interface WeightEntry {
+  weightKg: number;
+  date: string; // YYYY-MM-DD
+}
+
 export interface AgentContext {
   userId: string;
   userName: string;
@@ -100,6 +112,7 @@ export interface AgentContext {
   memories: Record<string, string> | null;
   todayLog: DailyLog | null;
   streak: number | null;
+  todayWater: WaterLog | null;
   imageUrl?: string; // if the user sent a photo
 }
 

@@ -5,13 +5,13 @@ import {
   setOnboardingState,
   setReminderRunId,
 } from "@caltext/db";
-import { calculateTDEE, decrypt, getTimezoneCity } from "@caltext/shared";
+import { CONSENT_VERSION, calculateTDEE, decrypt, getTimezoneCity } from "@caltext/shared";
 import { generateObject } from "ai";
 import { Chat } from "chat";
 import { createWebhook } from "workflow";
 import { start } from "workflow/api";
 import { z } from "zod";
-import { reminderLoop } from "./reminder-loop.js";
+import { reminderLoop } from "./reminder-loop";
 
 async function sendMessage(_userId: string, encryptedPhone: string, text: string) {
   "use step";
@@ -124,6 +124,8 @@ async function saveUser(
     heightCm: body.heightCm,
     weightKg: body.weightKg,
     onboardingComplete: true,
+    consentedAt: new Date().toISOString(),
+    consentVersion: CONSENT_VERSION,
   });
   await deleteOnboardingState(userId);
 }
@@ -235,6 +237,33 @@ export async function onboardingWorkflow(
   if (numberMatch?.[1]) {
     const parsed = parseInt(numberMatch[1], 10);
     if (parsed >= 1000 && parsed <= 5000) finalTarget = parsed;
+  }
+
+  const consentReply = await askAndWait(
+    userId,
+    encryptedPhone,
+    locale === "sv"
+      ? "En sista sak -- jag sparar din hälsodata (måltider, vikt, kroppsmått) för att följa dina framsteg. Du kan radera allt när som helst genom att bara fråga. Är det ok? 🔒"
+      : "One last thing -- I'll store your health data (meals, weight, body stats) to track your progress. You can delete everything anytime by just asking. Is that ok? 🔒",
+  );
+
+  const consentLower = consentReply.toLowerCase();
+  const declined =
+    consentLower.includes("no") ||
+    consentLower.includes("nej") ||
+    consentLower.includes("nope") ||
+    consentLower.includes("decline");
+
+  if (declined) {
+    await deleteOnboardingState(userId);
+    await sendMessage(
+      userId,
+      encryptedPhone,
+      locale === "sv"
+        ? "Inga problem! Jag raderar din data. Du är välkommen tillbaka när som helst 👋"
+        : "No worries! I'll delete your data. You're welcome back anytime 👋",
+    );
+    return;
   }
 
   await saveUser(

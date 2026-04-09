@@ -1,17 +1,24 @@
-import { env } from "./env.js";
+import { env } from "./env";
 
 const ALGORITHM = "AES-CBC";
 
 async function getKey(): Promise<CryptoKey> {
   const raw = hexToBytes(env.ENCRYPTION_KEY);
-  return crypto.subtle.importKey("raw", raw, { name: ALGORITHM }, false, ["encrypt", "decrypt"]);
+  return crypto.subtle.importKey("raw", raw.buffer as ArrayBuffer, { name: ALGORITHM }, false, [
+    "encrypt",
+    "decrypt",
+  ]);
 }
 
 async function deriveIv(plaintext: string): Promise<Uint8Array> {
   const raw = hexToBytes(env.ENCRYPTION_KEY);
-  const key = await crypto.subtle.importKey("raw", raw, { name: "HMAC", hash: "SHA-256" }, false, [
-    "sign",
-  ]);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    raw.buffer as ArrayBuffer,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(plaintext));
   return new Uint8Array(sig).slice(0, 16);
 }
@@ -20,7 +27,11 @@ export async function encrypt(plaintext: string): Promise<string> {
   const key = await getKey();
   const iv = await deriveIv(plaintext);
   const encoded = new TextEncoder().encode(plaintext);
-  const ciphertext = await crypto.subtle.encrypt({ name: ALGORITHM, iv }, key, encoded);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: ALGORITHM, iv: iv.buffer as ArrayBuffer },
+    key,
+    encoded,
+  );
   const combined = new Uint8Array(iv.length + ciphertext.byteLength);
   combined.set(iv, 0);
   combined.set(new Uint8Array(ciphertext), iv.length);
@@ -32,7 +43,11 @@ export async function decrypt(token: string): Promise<string> {
   const raw = base64UrlToBytes(token);
   const iv = raw.slice(0, 16);
   const ciphertext = raw.slice(16);
-  const decrypted = await crypto.subtle.decrypt({ name: ALGORITHM, iv }, key, ciphertext);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: ALGORITHM, iv: iv.buffer as ArrayBuffer },
+    key,
+    ciphertext,
+  );
   return new TextDecoder().decode(decrypted);
 }
 

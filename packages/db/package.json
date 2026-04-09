@@ -9,11 +9,13 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
     "@caltext/shared": "*",
-    "@upstash/redis": "^1"
+    "@upstash/redis": "^1",
+    "date-fns": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^22",

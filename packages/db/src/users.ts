@@ -1,5 +1,5 @@
 import type { UserProfile } from "@caltext/shared";
-import { getRedis } from "./client.js";
+import { getRedis } from "./client";
 
 const userKey = (userId: string) => `user:${userId}`;
 const phoneIndexKey = (encryptedPhone: string) => `phone:${encryptedPhone}`;
@@ -33,6 +33,8 @@ export async function getUser(userId: string): Promise<UserProfile | null> {
     heightCm: parseFloat(data.heightCm ?? "170"),
     weightKg: parseFloat(data.weightKg ?? "70"),
     onboardingComplete: data.onboardingComplete === "true",
+    consentedAt: data.consentedAt || null,
+    consentVersion: data.consentVersion || null,
     createdAt: data.createdAt ?? new Date().toISOString(),
   };
 }
@@ -51,6 +53,8 @@ export async function createUser(
     age: String(profile.age),
     heightCm: String(profile.heightCm),
     weightKg: String(profile.weightKg),
+    consentedAt: profile.consentedAt ?? "",
+    consentVersion: profile.consentVersion ?? "",
     createdAt: new Date().toISOString(),
   });
 }
@@ -66,4 +70,61 @@ export async function updateUser(
 export async function userExists(userId: string): Promise<boolean> {
   const redis = getRedis();
   return (await redis.exists(userKey(userId))) === 1;
+}
+
+export async function withdrawConsent(userId: string): Promise<void> {
+  const redis = getRedis();
+  await redis.hset(userKey(userId), { consentedAt: "", consentVersion: "" });
+}
+
+export async function deleteAllUserData(userId: string): Promise<void> {
+  const redis = getRedis();
+
+  const user = await getUser(userId);
+  const keysToDelete: string[] = [
+    userKey(userId),
+    `streak:${userId}`,
+    `memory:${userId}`,
+    `messages:${userId}`,
+    `weight:${userId}`,
+    `favorites:${userId}`,
+    `reminder:${userId}`,
+    `reminder_times:${userId}`,
+    `onboarding:${userId}`,
+    `export:${userId}`,
+  ];
+
+  if (user?.phone) {
+    keysToDelete.push(phoneIndexKey(user.phone));
+  }
+
+  const wildcardPatterns = [`meals:${userId}:*`, `daily:${userId}:*`, `water:${userId}:*`];
+
+  for (const pattern of wildcardPatterns) {
+    let cursor = "0";
+    do {
+      const [nextCursor, keys] = (await redis.scan(Number(cursor), {
+        match: pattern,
+        count: 100,
+      })) as unknown as [string, string[]];
+      cursor = nextCursor;
+      for (const key of keys) {
+        if (key.startsWith("meals:")) {
+          const mealIds = await redis.zrange<string[]>(key, 0, -1);
+          for (const mealId of mealIds) {
+            keysToDelete.push(`meal:${mealId}`);
+          }
+        }
+        keysToDelete.push(key);
+      }
+    } while (cursor !== "0");
+  }
+
+  if (keysToDelete.length > 0) {
+    const pipeline = redis.pipeline();
+    for (const key of keysToDelete) {
+      pipeline.del(key);
+    }
+    await pipeline.exec();
+  }
 }

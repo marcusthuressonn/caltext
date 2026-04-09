@@ -1,5 +1,5 @@
 import type { OnboardingState } from "@caltext/shared";
-import { getRedis } from "./client.js";
+import { getRedis } from "./client";
 
 const onboardingKey = (userId: string) => `onboarding:${userId}`;
 const TTL_24H = 60 * 60 * 24;

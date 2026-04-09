@@ -1,6 +1,6 @@
 import { getCountry } from "countries-and-timezones";
 import { parsePhoneNumber } from "libphonenumber-js";
-import type { PhoneRegionInfo } from "./types.js";
+import type { PhoneRegionInfo } from "./types";
 
 const COUNTRY_LOCALE: Record<string, string> = {
   US: "en",

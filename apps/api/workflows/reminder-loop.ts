@@ -1,6 +1,12 @@
 import { openai } from "@ai-sdk/openai";
 import { buildDailySummaryPrompt, buildReminderPrompt, buildWeeklyRecapPrompt } from "@caltext/ai";
-import { getDailyLog, getUser, getWeeklyLogs, updateStreak } from "@caltext/db";
+import {
+  getCustomReminderTimes,
+  getDailyLog,
+  getUser,
+  getWeeklyLogs,
+  updateStreak,
+} from "@caltext/db";
 import type { StreakInfo } from "@caltext/shared";
 import {
   DAILY_SUMMARY_HOUR,
@@ -131,7 +137,12 @@ export async function reminderLoop(userId: string) {
     const tz = user.timezone;
     const locale = user.locale;
 
-    for (const meal of MEAL_TIMES) {
+    const customTimes = await getCustomReminderTimes(userId);
+    const mealTimes = customTimes
+      ? customTimes.map((t) => ({ label: t.label, hour: t.hour, minute: t.minute, emoji: "🍽️" }))
+      : [...MEAL_TIMES];
+
+    for (const meal of mealTimes) {
       const target = nextLocalTime(meal.hour, meal.minute, tz);
       const waitMs = msUntil(target);
       if (waitMs > 0) {

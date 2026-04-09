@@ -1,6 +1,7 @@
 import type { DailyLog } from "@caltext/shared";
-import { getRedis } from "./client.js";
-import { getMealsForDate } from "./meals.js";
+import { format, parseISO, subDays } from "date-fns";
+import { getRedis } from "./client";
+import { getMealsForDate } from "./meals";
 
 const dailyKey = (userId: string, localDate: string) => `daily:${userId}:${localDate}`;
 
@@ -25,6 +26,32 @@ export async function updateDailyTotals(
   await pipeline.exec();
 }
 
+export async function subtractDailyTotals(
+  userId: string,
+  localDate: string,
+  calories: number,
+  protein: number,
+  carbs: number,
+  fat: number,
+  fiber: number,
+): Promise<void> {
+  const redis = getRedis();
+  const key = dailyKey(userId, localDate);
+  const pipeline = redis.pipeline();
+  pipeline.hincrbyfloat(key, "calories", -calories);
+  pipeline.hincrbyfloat(key, "protein", -protein);
+  pipeline.hincrbyfloat(key, "carbs", -carbs);
+  pipeline.hincrbyfloat(key, "fat", -fat);
+  pipeline.hincrbyfloat(key, "fiber", -fiber);
+  pipeline.hincrby(key, "mealCount", -1);
+  await pipeline.exec();
+}
+
+export async function deleteDailyLog(userId: string, localDate: string): Promise<void> {
+  const redis = getRedis();
+  await redis.del(dailyKey(userId, localDate));
+}
+
 export async function getDailyLog(userId: string, localDate: string): Promise<DailyLog> {
   const redis = getRedis();
   const data = await redis.hgetall<Record<string, string>>(dailyKey(userId, localDate));
@@ -46,11 +73,9 @@ export async function getWeeklyLogs(
   _tz: string,
 ): Promise<{ date: string; log: DailyLog }[]> {
   const results: { date: string; log: DailyLog }[] = [];
-  const end = new Date(endDate);
+  const end = parseISO(endDate);
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(end);
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0]!;
+    const dateStr = format(subDays(end, i), "yyyy-MM-dd");
     const log = await getDailyLog(userId, dateStr);
     results.push({ date: dateStr, log });
   }

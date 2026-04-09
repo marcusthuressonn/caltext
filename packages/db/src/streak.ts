@@ -1,5 +1,6 @@
 import type { StreakInfo } from "@caltext/shared";
-import { getRedis } from "./client.js";
+import { format, parseISO, subDays } from "date-fns";
+import { getRedis } from "./client";
 
 const streakKey = (userId: string) => `streak:${userId}`;
 
@@ -21,9 +22,7 @@ export async function updateStreak(userId: string, todayLocalDate: string): Prom
     return streak;
   }
 
-  const yesterday = new Date(todayLocalDate);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split("T")[0]!;
+  const yesterdayStr = format(subDays(parseISO(todayLocalDate), 1), "yyyy-MM-dd");
 
   let newCurrent: number;
   if (streak.lastLogDate === yesterdayStr) {

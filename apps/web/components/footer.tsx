@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 function XIcon() {
   return (
@@ -89,12 +90,12 @@ export function Footer() {
         </div>
 
         <div className="flex items-center gap-5 text-[13px] text-muted">
-          <a href="/privacy" className="transition-colors hover:text-primary">
+          <Link href="/privacy" className="transition-colors hover:text-primary">
             {t("privacy")}
-          </a>
-          <a href="/terms" className="transition-colors hover:text-primary">
+          </Link>
+          <Link href="/terms" className="transition-colors hover:text-primary">
             {t("terms")}
-          </a>
+          </Link>
         </div>
 
         <div className="text-center text-[12px] text-muted">

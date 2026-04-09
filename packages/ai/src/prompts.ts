@@ -1,5 +1,5 @@
 import type { AgentContext } from "@caltext/shared";
-import { getLocaleName } from "@caltext/shared";
+import { DEFAULT_WATER_TARGET_ML, getLocaleName } from "@caltext/shared";
 
 export function buildSystemPrompt(ctx: AgentContext): string {
   const localeName = getLocaleName(ctx.locale);
@@ -27,13 +27,51 @@ When the user is over their target:
 
 When the user sends a photo:
 - Use the identifyFood tool to analyze it
-- Then use lookupNutrition for each identified item
-- Then use logMeal to save it
-- Present the results in a nice formatted list
+- If identifyFood returns a "nutritionLabel" (packaged product with visible label), use those exact values directly -- do NOT call lookupNutrition. Present the breakdown and ask "Should I log this?" before calling logMeal.
+- If identifyFood returns "items" (a plate of food or unreadable packaging), use lookupNutrition for each identified item as usual. Present the breakdown and ask "Should I log this?" before calling logMeal.
+- Only call logMeal after the user confirms. If they correct something ("actually that was a small portion"), re-lookup and present again.
 
 When the user describes food in text (no photo):
 - Use lookupNutrition directly for each item they mention
-- Then use logMeal to save it
+- Present the breakdown and ask "Should I log this?" before calling logMeal
+- Only call logMeal after the user confirms
+
+When the user confirms a pending meal (says "yes", "log it", "looks good", etc.):
+- Call logMeal with the previously identified items
+
+When the user wants to delete or undo a meal:
+- Use getDailyLog to find the meal, then use deleteMeal with the mealId
+- Confirm what was removed and show updated daily totals
+
+When the user wants to change their calorie target, goal, weight, activity level, or other profile info:
+- Use updateProfile to make the change
+- If they update weight/activity/goal, mention the recalculated daily target
+
+When the user mentions drinking water:
+- Use logWater to record it. Assume 250ml for "a glass", 500ml for "a bottle", 350ml for "a can"
+- Report glasses and how much is left vs their ${DEFAULT_WATER_TARGET_ML}ml daily target
+
+When the user mentions their weight or weighing themselves:
+- Use logWeight to record it
+- Show the change from their last entry and recent trend
+
+When the user asks to save a favorite or wants quick logging:
+- Use saveFavorite to save a meal they want to re-log easily
+- When they ask to log a favorite, use logFavorite
+- Tell them they can say "log my [name]" for quick logging
+
+When the user asks to change reminder times:
+- Use setReminders with their preferred schedule
+
+When the user asks to export their data, see their history, or requests GDPR data:
+- Use exportData and send them the readable summary
+
+When the user asks to delete their account, data, or says "forget me":
+- Use deleteAccount with confirmed=false first to show a warning
+- Only call with confirmed=true after the user explicitly confirms deletion
+
+If the user says they want to withdraw consent or stop data processing:
+- Acknowledge it and use deleteAccount to handle their request
 
 When you learn something about the user (dietary restrictions, allergies, preferences, favorites):
 - Proactively save it using saveMemory
@@ -55,6 +93,10 @@ When you learn something about the user (dietary restrictions, allergies, prefer
   if (ctx.todayLog && ctx.todayLog.mealCount > 0) {
     prompt += `\n\nToday so far: ${ctx.todayLog.mealCount} meals, ${ctx.todayLog.calories} kcal of ${ctx.dailyCalorieTarget} target`;
     prompt += `\n(${Math.round(ctx.todayLog.protein)}g protein, ${Math.round(ctx.todayLog.carbs)}g carbs, ${Math.round(ctx.todayLog.fat)}g fat)`;
+  }
+
+  if (ctx.todayWater && ctx.todayWater.totalMl > 0) {
+    prompt += `\nWater today: ${ctx.todayWater.totalMl}ml (${ctx.todayWater.glasses} glasses)`;
   }
 
   if (ctx.streak && ctx.streak > 1) {

@@ -1,4 +1,4 @@
-import { getRedis } from "./client.js";
+import { getRedis } from "./client";
 
 const memoryKey = (userId: string) => `memory:${userId}`;
 
