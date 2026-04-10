@@ -18,7 +18,11 @@ export const mealItemSchema = z.object({
 
 export type MealItemInput = z.infer<typeof mealItemSchema>;
 
-export function aggregateMealTotals(items: { nutrition: { calories: number; protein: number; carbs: number; fat: number; fiber: number } }[]) {
+export function aggregateMealTotals(
+  items: {
+    nutrition: { calories: number; protein: number; carbs: number; fat: number; fiber: number };
+  }[],
+) {
   return {
     totalCalories: items.reduce((s, i) => s + i.nutrition.calories, 0),
     totalProtein: items.reduce((s, i) => s + i.nutrition.protein, 0),

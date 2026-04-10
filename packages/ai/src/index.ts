@@ -17,9 +17,9 @@ export { listFavoritesTool, logFavoriteTool, saveFavoriteTool } from "./tools/fa
 export { getDailyLogTool, getWeeklyLogTool } from "./tools/get-history";
 export { getUserProfile } from "./tools/get-profile";
 export {
+  createIdentifyFoodTool,
   FOOD_IDENTIFICATION_PROMPT,
   foodIdentificationSchema,
-  createIdentifyFoodTool,
 } from "./tools/identify-food";
 export { logMeal } from "./tools/log-meal";
 export { getWaterLogTool, logWaterTool } from "./tools/log-water";

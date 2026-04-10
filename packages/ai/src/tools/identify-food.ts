@@ -23,14 +23,19 @@ export const foodIdentificationSchema = z.object({
         .string()
         .describe("How it appears prepared: raw, grilled, fried, boiled, etc."),
       confidence: z.enum(["high", "medium", "low"]),
-      notes: z.string().nullable().describe("Anything uncertain, e.g. 'could be diet or regular'. Null if nothing to note."),
-      nutrition: z.object({
-        calories: z.number().describe("Estimated kcal for this item at the estimated weight"),
-        protein: z.number().describe("Estimated grams of protein"),
-        carbs: z.number().describe("Estimated grams of carbohydrates"),
-        fat: z.number().describe("Estimated grams of fat"),
-        fiber: z.number().describe("Estimated grams of fiber"),
-      }).describe("Nutrition estimate for this item at the estimated gram weight"),
+      notes: z
+        .string()
+        .nullable()
+        .describe("Anything uncertain, e.g. 'could be diet or regular'. Null if nothing to note."),
+      nutrition: z
+        .object({
+          calories: z.number().describe("Estimated kcal for this item at the estimated weight"),
+          protein: z.number().describe("Estimated grams of protein"),
+          carbs: z.number().describe("Estimated grams of carbohydrates"),
+          fat: z.number().describe("Estimated grams of fat"),
+          fiber: z.number().describe("Estimated grams of fiber"),
+        })
+        .describe("Nutrition estimate for this item at the estimated gram weight"),
     }),
   ),
   sceneContext: z

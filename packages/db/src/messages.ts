@@ -7,11 +7,9 @@ const TTL_30_DAYS = 60 * 60 * 24 * 30;
 
 export async function saveConversationMessages(userId: string, messages: unknown[]): Promise<void> {
   const redis = getRedis();
-  await redis.set(
-    messagesKey(userId),
-    JSON.stringify(messages.slice(-MAX_CONVERSATION_MESSAGES)),
-    { ex: TTL_30_DAYS },
-  );
+  await redis.set(messagesKey(userId), JSON.stringify(messages.slice(-MAX_CONVERSATION_MESSAGES)), {
+    ex: TTL_30_DAYS,
+  });
 }
 
 export async function getConversationMessages<T = unknown>(userId: string): Promise<T[]> {

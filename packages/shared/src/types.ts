@@ -86,18 +86,12 @@ export interface OnboardingState {
   lastBotReply?: string;
 }
 
-export type OnboardingFieldKey =
-  | "name"
-  | "body_stats"
-  | "goal"
-  | "activity"
-  | "consent";
+export type OnboardingFieldKey = "name" | "body_stats" | "goal" | "activity" | "consent";
 
 export function getMissingFields(state: OnboardingState): OnboardingFieldKey[] {
   const missing: OnboardingFieldKey[] = [];
   if (!state.name) missing.push("name");
-  if (!state.sex || !state.age || !state.heightCm || !state.weightKg)
-    missing.push("body_stats");
+  if (!state.sex || !state.age || !state.heightCm || !state.weightKg) missing.push("body_stats");
   if (!state.goal) missing.push("goal");
   if (!state.activity) missing.push("activity");
   if (missing.length === 0 && !state.consented) missing.push("consent");

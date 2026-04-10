@@ -19,7 +19,9 @@ const mockRedis = {
         ops.push(() => mockRedis.hincrbyfloat(key, field, value));
         return p;
       },
-      expire() { return p; },
+      expire() {
+        return p;
+      },
       exec: () => Promise.all(ops.map((fn) => fn())),
     };
     return p;

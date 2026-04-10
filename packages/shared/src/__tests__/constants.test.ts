@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { calculateBMR, calculateTDEE, MIN_DAILY_CALORIES, MAX_DAILY_CALORIES } from "../constants";
+import { calculateBMR, calculateTDEE, MAX_DAILY_CALORIES, MIN_DAILY_CALORIES } from "../constants";
 
 describe("calculateBMR (Mifflin-St Jeor)", () => {
   test("male — 80kg, 180cm, age 30", () => {
@@ -28,9 +28,7 @@ describe("calculateTDEE", () => {
 
   test("female, sedentary, lose weight — clamped to minimum", () => {
     // BMR = 1395.25, raw = 1395.25 * 1.2 - 500 = 1174, clamped to 1200
-    expect(calculateTDEE("female", 65, 165, 25, "sedentary", "lose")).toBe(
-      MIN_DAILY_CALORIES,
-    );
+    expect(calculateTDEE("female", 65, 165, 25, "sedentary", "lose")).toBe(MIN_DAILY_CALORIES);
   });
 
   test("male, very active, gain weight", () => {

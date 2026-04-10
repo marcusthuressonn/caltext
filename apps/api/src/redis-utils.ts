@@ -40,6 +40,8 @@ export async function acquireSlot(
 
   return {
     status: "acquired",
-    release: async () => { await redis.del(lockKey); },
+    release: async () => {
+      await redis.del(lockKey);
+    },
   };
 }

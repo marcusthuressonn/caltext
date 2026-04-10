@@ -37,7 +37,12 @@ export async function saveMeal(meal: MealEntry): Promise<void> {
   await pipeline.exec();
 }
 
-function parseMeal(id: string, data: Record<string, unknown>, fallbackUserId?: string, fallbackDate?: string): MealEntry {
+function parseMeal(
+  id: string,
+  data: Record<string, unknown>,
+  fallbackUserId?: string,
+  fallbackDate?: string,
+): MealEntry {
   return {
     id,
     userId: String(data.userId ?? fallbackUserId ?? ""),
@@ -49,7 +54,7 @@ function parseMeal(id: string, data: Record<string, unknown>, fallbackUserId?: s
     totalFat: Number(data.totalFat ?? 0),
     totalFiber: Number(data.totalFiber ?? 0),
     photoUrl: data.photoUrl ? String(data.photoUrl) : undefined,
-    source: (String(data.source ?? "text") as MealEntry["source"]),
+    source: String(data.source ?? "text") as MealEntry["source"],
     timestamp: String(data.timestamp ?? new Date().toISOString()),
     localDate: String(data.localDate ?? fallbackDate ?? ""),
   };

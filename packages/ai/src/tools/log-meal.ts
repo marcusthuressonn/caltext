@@ -10,7 +10,11 @@ export const logMeal = tool({
   inputSchema: z.object({
     userId: z.string(),
     timezone: z.string(),
-    mealName: z.string().describe("Short descriptive name for the meal, e.g. 'Greek plate', 'Morning oatmeal', 'Chicken salad lunch'"),
+    mealName: z
+      .string()
+      .describe(
+        "Short descriptive name for the meal, e.g. 'Greek plate', 'Morning oatmeal', 'Chicken salad lunch'",
+      ),
     items: z.array(mealItemSchema),
     photoUrl: z.string().optional(),
     source: z.enum(["photo", "text", "manual"]),
