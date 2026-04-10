@@ -18,9 +18,7 @@ app.post("/webhooks/sendblue", async (c) => {
     if (!msg) return c.json({ ok: true });
 
     markRead(msg.phone);
-    handleIncoming(msg.phone, msg.text, msg.imageUrl, msg.messageId).catch((err) => {
-      log.error(err as Error);
-    });
+    await handleIncoming(msg.phone, msg.text, msg.imageUrl, msg.messageId);
     return c.json({ ok: true });
   } catch (error) {
     log.error(error as Error);
