@@ -67,8 +67,9 @@ export async function handleOnboarding(
   const merged: OnboardingState = { ...state, ...extracted };
 
   if (isOnboardingComplete(merged)) {
+    const sex = merged.sex ?? "unspecified";
     const target = calculateTDEE(
-      merged.sex!,
+      sex,
       merged.weightKg!,
       merged.heightCm!,
       merged.age!,
@@ -99,7 +100,7 @@ export async function handleOnboarding(
         dailyCalorieTarget: target,
         goal: merged.goal!,
         activity: merged.activity!,
-        sex: merged.sex!,
+        sex,
         age: merged.age!,
         heightCm: merged.heightCm!,
         weightKg: merged.weightKg!,

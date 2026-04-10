@@ -34,24 +34,24 @@ export const STREAK_MILESTONES: Record<number, string> = {
   100: "Triple digits!! 🔥🔥🔥 This is insane",
 };
 
-// Mifflin-St Jeor equation
+// Mifflin-St Jeor equation; "unspecified" uses the average of male and female constants (+5 and −161 → −78)
 export function calculateBMR(
-  sex: "male" | "female",
+  sex: "male" | "female" | "unspecified",
   weightKg: number,
   heightCm: number,
   age: number,
 ): number {
-  if (sex === "male") {
-    return 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
-  }
-  return 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+  const base = 10 * weightKg + 6.25 * heightCm - 5 * age;
+  if (sex === "male") return base + 5;
+  if (sex === "female") return base - 161;
+  return base - 78;
 }
 
 export const MIN_DAILY_CALORIES = 1200;
 export const MAX_DAILY_CALORIES = 5000;
 
 export function calculateTDEE(
-  sex: "male" | "female",
+  sex: "male" | "female" | "unspecified",
   weightKg: number,
   heightCm: number,
   age: number,

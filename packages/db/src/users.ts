@@ -29,7 +29,7 @@ export async function getUser(userId: string): Promise<UserProfile | null> {
     dailyCalorieTarget: Number(d.dailyCalorieTarget ?? 2000),
     goal: String(d.goal ?? "maintain") as UserProfile["goal"],
     activity: String(d.activity ?? "moderate") as UserProfile["activity"],
-    sex: String(d.sex ?? "male") as UserProfile["sex"],
+    sex: String(d.sex ?? "unspecified") as UserProfile["sex"],
     age: Number(d.age ?? 30),
     heightCm: Number(d.heightCm ?? 170),
     weightKg: Number(d.weightKg ?? 70),

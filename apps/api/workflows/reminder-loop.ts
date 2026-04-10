@@ -47,7 +47,6 @@ export async function reminderLoop(userId: string) {
       }
 
       const log = await loadDailyLog(userId, tz);
-      const remaining = Math.max(0, user.dailyCalorieTarget - log.calories);
 
       const alreadyLogged = log.meals.some((m) => {
         const mealHour = new Date(m.timestamp).getHours();
@@ -56,11 +55,14 @@ export async function reminderLoop(userId: string) {
 
       if (log.mealCount === 0 || !alreadyLogged) {
         const reminder = await generateReminder(
+          userId,
           meal.label,
           meal.emoji,
           locale,
-          remaining,
           user.name,
+          log.calories,
+          user.dailyCalorieTarget,
+          log.mealCount,
         );
         await sendMsg(userId, reminder);
       }

@@ -122,7 +122,7 @@
     "intro": "Cal Text (\"Caltext\", \"we\", \"us\") is committed to protecting your privacy. This policy explains what data we collect, how we use it, and your rights.",
     "dataCollection": {
       "title": "Data We Collect",
-      "body": "When you use Caltext, we collect:\n\n• Your phone number (to identify your account and deliver messages via iMessage)\n• Your name, age, sex, height, and weight (to calculate your personalized calorie target)\n• Meal descriptions and photos you send us\n• Nutrition and calorie data derived from your meals\n• Your timezone and country (detected from your phone number for localization)"
+      "body": "When you use Caltext, we collect:\n\n• Your phone number (to identify your account and deliver messages via iMessage)\n• Your name, age, height, and weight (to calculate your personalized calorie target)\n• Sex, if you choose to share it — used only for the standard calorie formula; if you skip it, we use a neutral estimate\n• Meal descriptions and photos you send us\n• Nutrition and calorie data derived from your meals\n• Your timezone and country (detected from your phone number for localization)"
     },
     "dataUsage": {
       "title": "How We Use Your Data",
@@ -130,7 +130,7 @@
     },
     "dataStorage": {
       "title": "Data Storage & Security",
-      "body": "Your phone number is encrypted at rest using AES-256 encryption. All data is stored on secure, access-controlled servers. We use industry-standard security measures to protect your information."
+      "body": "Connections to our website and services use TLS (HTTPS). Your phone number is encrypted at rest using AES. Message history, meal log content, onboarding data during setup, and similar payloads are stored as encrypted application-layer blobs. Your profile fields (such as name and calorie target) are stored in our database with strict access controls. All data is stored on secure, access-controlled servers. We use industry-standard security measures to protect your information."
     },
     "thirdParty": {
       "title": "Third-Party Services",

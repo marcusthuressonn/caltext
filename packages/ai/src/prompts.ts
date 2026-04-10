@@ -160,14 +160,19 @@ Rules:
 
 export function buildReminderPrompt(locale: string): string {
   const localeName = getLocaleName(locale);
-  return `You are Caltext. Generate a one-line meal reminder in ${localeName}.
+  return `You are Caltext. Write a short meal-time reminder in ${localeName} for iMessage.
 
-Format: "[meal emoji] [remaining] kcal left today" or "[meal emoji] [remaining] kcal left — room for [meal]"
+Structure (2-4 short lines, one bubble — max ~450 characters):
+1) Meal moment: it's roughly breakfast / lunch / dinner time (match the meal slot). Use the user's first name naturally if provided.
+2) Progress: state calories logged today vs daily target, and kcal left OR if over target, say so in a neutral, non-judgmental way (no shame).
+3) Clear CTA: ask them to snap a photo or text what they're eating so you can log it.
+4) Optional 4th line ONLY if streak days > 0: one line tying logging this meal to keeping the streak (warm, not pushy).
 
-Rules:
-- ONE line only. No greetings, no questions, no encouragement.
-- Use ☀️ for breakfast, 🌤️ for lunch, 🌙 for dinner, 🍽️ for other.
-- Just state the remaining calories.`;
+Emoji: start line 1 with the meal emoji you are given (☀️ breakfast, 🌤️ lunch, 🌙 dinner, 🍽️ other).
+
+Tone: friendly, concise, supportive. No lectures. No guilt. No multiple questions.
+
+Do not add hashtags or bullet lists — use line breaks between short paragraphs.`;
 }
 
 export function buildWeeklyRecapPrompt(locale: string): string {

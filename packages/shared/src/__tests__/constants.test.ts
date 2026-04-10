@@ -16,6 +16,13 @@ describe("calculateBMR (Mifflin-St Jeor)", () => {
     // 10*50 + 6.25*160 - 5*20 + 5 = 500 + 1000 - 100 + 5 = 1405
     expect(calculateBMR("male", 50, 160, 20)).toBe(1405);
   });
+
+  test("unspecified — average of male and female constants", () => {
+    const male = calculateBMR("male", 80, 180, 30);
+    const female = calculateBMR("female", 80, 180, 30);
+    const mid = (male + female) / 2;
+    expect(calculateBMR("unspecified", 80, 180, 30)).toBe(mid);
+  });
 });
 
 describe("calculateTDEE", () => {
@@ -24,6 +31,14 @@ describe("calculateTDEE", () => {
     expect(calculateTDEE("male", 80, 180, 30, "moderate", "maintain")).toBe(
       Math.round(1780 * 1.55),
     );
+  });
+
+  test("unspecified TDEE between male and female for same stats", () => {
+    const male = calculateTDEE("male", 80, 180, 30, "moderate", "maintain");
+    const female = calculateTDEE("female", 80, 180, 30, "moderate", "maintain");
+    const unspec = calculateTDEE("unspecified", 80, 180, 30, "moderate", "maintain");
+    expect(unspec).toBeGreaterThan(Math.min(male, female));
+    expect(unspec).toBeLessThan(Math.max(male, female));
   });
 
   test("female, sedentary, lose weight — clamped to minimum", () => {

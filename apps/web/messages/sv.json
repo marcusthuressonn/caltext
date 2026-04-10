@@ -122,7 +122,7 @@
     "intro": "Cal Text (\"Caltext\", \"vi\", \"oss\") är engagerade i att skydda din integritet. Denna policy förklarar vilken data vi samlar in, hur vi använder den och dina rättigheter.",
     "dataCollection": {
       "title": "Data vi samlar in",
-      "body": "När du använder Caltext samlar vi in:\n\n• Ditt telefonnummer (för att identifiera ditt konto och leverera meddelanden via iMessage)\n• Ditt namn, ålder, kön, längd och vikt (för att beräkna ditt personliga kalorimål)\n• Måltidsbeskrivningar och bilder du skickar till oss\n• Närings- och kaloridata som härleds från dina måltider\n• Din tidszon och land (detekteras från ditt telefonnummer för lokalisering)"
+      "body": "När du använder Caltext samlar vi in:\n\n• Ditt telefonnummer (för att identifiera ditt konto och leverera meddelanden via iMessage)\n• Ditt namn, ålder, längd och vikt (för att beräkna ditt personliga kalorimål)\n• Kön, om du väljer att dela det — används endast för standardformeln för kalorier; om du hoppar över det använder vi en neutral uppskattning\n• Måltidsbeskrivningar och bilder du skickar till oss\n• Närings- och kaloridata som härleds från dina måltider\n• Din tidszon och land (detekteras från ditt telefonnummer för lokalisering)"
     },
     "dataUsage": {
       "title": "Hur vi använder din data",
@@ -130,7 +130,7 @@
     },
     "dataStorage": {
       "title": "Datalagring och säkerhet",
-      "body": "Ditt telefonnummer krypteras vid lagring med AES-256-kryptering. All data lagras på säkra, åtkomstkontrollerade servrar. Vi använder branschstandardiserade säkerhetsåtgärder för att skydda din information."
+      "body": "Anslutningar till vår webbplats och våra tjänster använder TLS (HTTPS). Ditt telefonnummer krypteras vid lagring med AES. Meddelandehistorik, innehåll i måltidsloggar, onboardingdata under uppsättning och liknande lagras som krypterade applikationslager-blobbar. Dina profilfält (t.ex. namn och kalorimål) lagras i vår databas med strikt åtkomstkontroll. All data lagras på säkra, åtkomstkontrollerade servrar. Vi använder branschstandardiserade säkerhetsåtgärder för att skydda din information."
     },
     "thirdParty": {
       "title": "Tredjepartstjänster",

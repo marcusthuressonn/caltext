@@ -8,7 +8,12 @@ const defaultModel = openai("gpt-4.1-mini");
 
 const extractionSchema = z.object({
   name: z.string().nullable().describe("User's first name. Null if not mentioned."),
-  sex: z.enum(["male", "female"]).nullable().describe("Null if not mentioned."),
+  sex: z
+    .enum(["male", "female", "unspecified"])
+    .nullable()
+    .describe(
+      "male/female for Mifflin-St Jeor; unspecified if user skips, prefers not to say, or declines. Null if not mentioned.",
+    ),
   age: z.number().nullable().describe("Age in years. Null if not mentioned."),
   heightCm: z
     .number()
@@ -55,7 +60,6 @@ function describeState(state: OnboardingState): string {
 function describeMissing(state: OnboardingState): string {
   const missing: string[] = [];
   if (!state.name) missing.push("name");
-  if (!state.sex) missing.push("sex");
   if (!state.age) missing.push("age");
   if (!state.heightCm) missing.push("height");
   if (!state.weightKg) missing.push("weight");
@@ -94,23 +98,28 @@ export async function processOnboardingMessage(
   let situation: string;
 
   if (ctx.isFirstMessage) {
-    situation = `This is the user's FIRST message. Welcome them warmly as Caltext, a calorie tracking buddy in iMessage. In your reply, naturally explain everything you need to get them started:
-- Their name
-- Basic stats: sex, age, height, weight (any units are fine)
-- Goal: lose weight, maintain, or build muscle
-- Activity level: sedentary, light, moderate, active, or very active
-- Mention you'll store their health data for tracking and they can delete it anytime (this covers consent)
-Make it feel like one natural, friendly message -- not a bulleted checklist. Keep it casual and iMessage-style.`;
+    situation = `This is the user's FIRST message. Welcome them as Caltext, a calorie tracking buddy in iMessage.
+
+CONTENT (keep SHORT — about one phone screen, ~3-6 short sentences OR two bubbles max):
+- Lead with the payoff: they'll get a **personal daily calorie target** in about **~2 minutes**.
+- Ask for: **name**, **goal** (lose/maintain/gain), **height, weight, age** (any units; **rough estimates are fine**), **activity** (sedentary → very active).
+- **Sex is optional** for the standard formula: **male**, **female**, or say **skip** / prefer not to say → we use a **neutral estimate** (middle of the usual male/female range). Do NOT require sex.
+- After setup: they **text or photo** meals. Mention briefly: **meal-time nudges** in their timezone, **evening daily summary**, **weekly recap**. Optionally use 2-4 lines with **one emoji per line** for those perks (e.g. meal nudges, summary, recap) OR one prose sentence — not both styles at once.
+- Storage: we **save** what they share so targets and logs work; they can **delete anytime**.
+- End with a clear CTA: they can send **everything in one message or a few messages** — you'll ask for gaps.
+
+TONE: friendly, iMessage-native, not a bulleted essay.`;
   } else if (ctx.dailyTarget) {
     situation = `The user is fully set up! Their daily calorie target is ${ctx.dailyTarget} kcal. Reply with ONLY:
 "✅ All set! Your daily target is ${ctx.dailyTarget} kcal.
-Send a photo or text what you eat to start tracking."
+Snap or text your next meal to start logging. You'll get light meal reminders and an evening summary."
 No extra commentary or enthusiasm.`;
   } else {
     situation = `This is a follow-up message. The user already provided some info.
 Already collected: ${describeState(state)}.
 Still missing: ${describeMissing(state)}.
-In your reply: briefly acknowledge any new info they just provided, then naturally ask for whatever is still missing. If only consent is missing, warmly ask for their OK to store health data (mention they can delete anytime). Keep it short and conversational.`;
+
+In your reply: briefly acknowledge any new info they just provided, then ask only for what is still missing — **one or two asks at a time** if several fields are missing (do not dump the full checklist again). If only consent is missing, warmly ask for their OK to store health data (mention they can delete anytime). Keep it short and conversational.`;
   }
 
   const { output } = await generateText({
@@ -127,13 +136,14 @@ SITUATION: ${situation}
 EXTRACTION INSTRUCTIONS:
 - Extract values the user stated or confirmed in this message. Use null for anything not addressed.
 - CRITICAL: If your previous message asked the user to confirm something (e.g. consent) and the user replies affirmatively (yes, yeah, yep, ja, japp, oui, si, ok, sure, etc.), mark it as true.
+- sex: use "unspecified" if they skip, decline, prefer not to say, or say neutral — NOT null if they clearly declined sex.
 - For height: convert to cm (5'6" = 167.6cm, 6ft = 182.9cm)
 - For weight: convert to kg (1lb = 0.4536kg)
 - consented: true if they agreed to data storage (including a general "yes" when consent was asked about), null only if consent was never mentioned
 - detectedLocale: detect the BCP-47 language code from the user's message text
 
 REPLY INSTRUCTIONS:
-- Write a short, casual iMessage-style reply (1-3 emoji max)
+- Write a short, casual iMessage-style reply (1-3 emoji max unless using the optional one-emoji-per-line micro-list for perks in the first message only)
 - Do NOT repeat or echo back what the user just told you. Just move on to what's next.
 - Never repeat a greeting if the user already introduced themselves
 - Be direct like a friend texting, not formal

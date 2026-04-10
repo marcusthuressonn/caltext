@@ -172,6 +172,12 @@ describe("buildReminderPrompt", () => {
   test("includes locale name", () => {
     expect(buildReminderPrompt("en")).toContain("English");
   });
+
+  test("describes progress and log CTA", () => {
+    const p = buildReminderPrompt("en");
+    expect(p.toLowerCase()).toContain("progress");
+    expect(p.toLowerCase()).toContain("photo");
+  });
 });
 
 describe("buildWeeklyRecapPrompt", () => {

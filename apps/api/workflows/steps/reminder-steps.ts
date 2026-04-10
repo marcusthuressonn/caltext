@@ -3,6 +3,7 @@ import { buildDailySummaryPrompt, buildReminderPrompt, buildWeeklyRecapPrompt } 
 import {
   getCustomReminderTimes,
   getDailyLog,
+  getStreak,
   getUser,
   getWeeklyLogs,
   updateStreak,
@@ -36,17 +37,35 @@ export async function sendMsg(userId: string, text: string) {
 }
 
 export async function generateReminder(
+  userId: string,
   mealLabel: string,
   mealEmoji: string,
   locale: string,
-  remaining: number,
   userName: string,
+  caloriesLoggedToday: number,
+  dailyTarget: number,
+  mealCountToday: number,
 ): Promise<string> {
   "use step";
+  const remaining = Math.max(0, dailyTarget - caloriesLoggedToday);
+  const overBy = Math.max(0, caloriesLoggedToday - dailyTarget);
+  const streak = await getStreak(userId);
+  const streakHint =
+    streak.current > 0
+      ? `They have a ${streak.current}-day logging streak (longest ever: ${streak.longest}). You may mention it once if it fits the optional 4th line.`
+      : "No active streak (0 days) — do not mention streaks.";
+
   const result = await generateText({
     model: openai("gpt-4.1-mini"),
     system: buildReminderPrompt(locale),
-    prompt: `Generate a ${mealLabel} reminder for ${userName}. They have ${remaining} kcal remaining today. Use ${mealEmoji} emoji.`,
+    prompt: `Generate a ${mealLabel} reminder.
+Meal emoji to lead with: ${mealEmoji}
+User first name: ${userName}
+Today so far: ${Math.round(caloriesLoggedToday)} kcal logged of ${dailyTarget} kcal target.
+Kcal remaining (0 if over target): ${Math.round(remaining)}.
+If over target, they are ${Math.round(overBy)} kcal over — acknowledge neutrally.
+Meals logged today (count): ${mealCountToday}.
+${streakHint}`,
   });
   return result.text;
 }

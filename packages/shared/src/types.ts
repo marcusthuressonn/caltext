@@ -8,7 +8,7 @@ export interface UserProfile {
   dailyCalorieTarget: number;
   goal: "lose" | "maintain" | "gain";
   activity: "sedentary" | "light" | "moderate" | "active" | "very_active";
-  sex: "male" | "female";
+  sex: "male" | "female" | "unspecified";
   age: number;
   heightCm: number;
   weightKg: number;
@@ -75,7 +75,7 @@ export interface OnboardingState {
   name?: string;
   timezoneConfirmed?: boolean;
   timezone?: string;
-  sex?: "male" | "female";
+  sex?: "male" | "female" | "unspecified";
   age?: number;
   heightCm?: number;
   weightKg?: number;
@@ -91,7 +91,7 @@ export type OnboardingFieldKey = "name" | "body_stats" | "goal" | "activity" | "
 export function getMissingFields(state: OnboardingState): OnboardingFieldKey[] {
   const missing: OnboardingFieldKey[] = [];
   if (!state.name) missing.push("name");
-  if (!state.sex || !state.age || !state.heightCm || !state.weightKg) missing.push("body_stats");
+  if (!state.age || !state.heightCm || !state.weightKg) missing.push("body_stats");
   if (!state.goal) missing.push("goal");
   if (!state.activity) missing.push("activity");
   if (missing.length === 0 && !state.consented) missing.push("consent");
