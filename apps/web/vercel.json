@@ -1,6 +1,6 @@
 {
   "regions": ["iad1", "fra1", "hnd1"],
-  "installCommand": "cd ../.. && bun install --frozen-lockfile",
+  "installCommand": "",
   "ignoreCommand": "exit 0",
   "bunVersion": "1.x"
 }
