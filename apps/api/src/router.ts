@@ -1,55 +1,49 @@
-import { createPhoneMapping, getOnboardingState, getUser, resolveUserId } from "@caltext/db";
+import { createPhoneMapping, getUser, resolveUserId } from "@caltext/db";
 import { decrypt, detectRegion, generateId } from "@caltext/shared";
-import { start } from "workflow/api";
-import { handleMessage } from "../workflows/handle-message";
-import { onboardingWorkflow } from "../workflows/onboarding";
+import type { RequestLogger } from "evlog";
+import { handleMessage } from "./handlers/message";
+import { handleOnboarding } from "./handlers/onboarding";
 
 export async function routeMessage(
+  log: RequestLogger,
   encryptedPhone: string,
   text: string,
   imageUrl?: string,
-): Promise<string> {
-  const userId = await resolveUserId(encryptedPhone);
+): Promise<string[]> {
+  let userId = await resolveUserId(encryptedPhone);
 
   if (!userId) {
-    const newId = generateId();
-    await createPhoneMapping(encryptedPhone, newId);
-    const region = detectRegion(await decrypt(encryptedPhone));
-    await start(onboardingWorkflow, [
-      newId,
-      encryptedPhone,
-      region.locale,
-      region.timezone,
-      region.country,
-      region.countryName,
-    ]);
-    return "__onboarding_started__";
+    userId = generateId();
+    await createPhoneMapping(encryptedPhone, userId);
+    log.set({ newUser: true });
   }
+
+  log.set({ userId });
 
   const user = await getUser(userId);
-  if (!user) return "Something went wrong. Try messaging me again!";
 
-  if (user.onboardingComplete && !user.consentedAt) {
-    return "Your data processing consent has been withdrawn. Message me again if you'd like to start over!";
+  if (!user?.onboardingComplete) {
+    log.set({ route: "onboarding" });
+    const region = !user ? detectRegion(await decrypt(encryptedPhone)) : null;
+    return handleOnboarding(
+      log,
+      userId,
+      text,
+      encryptedPhone,
+      region?.locale ?? user?.locale ?? "en",
+      region?.timezone ?? user?.timezone ?? "UTC",
+      region?.country ?? user?.country ?? "US",
+    );
   }
 
-  if (!user.onboardingComplete) {
-    const onboardingState = await getOnboardingState(userId);
-    if (onboardingState?.webhookUrl) {
-      try {
-        await fetch(onboardingState.webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, imageUrl }),
-        });
-        return "__onboarding_resumed__";
-      } catch {
-        return "I'm having trouble processing that. Can you try again?";
-      }
-    }
-    return "Let me restart your setup. What's your name?";
+  if (!user.consentedAt) {
+    log.set({ route: "consent_withdrawn" });
+    return [
+      "Your data processing consent has been withdrawn. Message me again if you'd like to start over!",
+    ];
   }
 
-  await start(handleMessage, [userId, text, imageUrl]);
-  return "__assistant_started__";
+  log.set({ route: "message" });
+  const reply = await handleMessage(log, userId, text, imageUrl);
+  return reply ? [reply] : [];
 }

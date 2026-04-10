@@ -27,7 +27,6 @@ export interface FoodItem {
 }
 
 export interface NutritionInfo {
-  fdcId?: number; // USDA FoodData Central ID
   matchedName: string;
   calories: number;
   protein: number;
@@ -43,6 +42,7 @@ export interface MealItem extends FoodItem {
 export interface MealEntry {
   id: string;
   userId: string;
+  name?: string; // e.g. "Greek plate", "Afternoon snack"
   items: MealItem[];
   totalCalories: number;
   totalProtein: number;
@@ -72,14 +72,8 @@ export interface StreakInfo {
 }
 
 export interface OnboardingState {
-  step:
-    | "await_name"
-    | "await_timezone"
-    | "await_body"
-    | "await_goal"
-    | "await_activity"
-    | "await_confirm";
   name?: string;
+  timezoneConfirmed?: boolean;
   timezone?: string;
   sex?: "male" | "female";
   age?: number;
@@ -87,8 +81,31 @@ export interface OnboardingState {
   weightKg?: number;
   goal?: "lose" | "maintain" | "gain";
   activity?: "sedentary" | "light" | "moderate" | "active" | "very_active";
-  calculatedTarget?: number;
-  webhookUrl?: string; // current webhook URL for resuming
+  consented?: boolean;
+  detectedLocale?: string;
+  lastBotReply?: string;
+}
+
+export type OnboardingFieldKey =
+  | "name"
+  | "body_stats"
+  | "goal"
+  | "activity"
+  | "consent";
+
+export function getMissingFields(state: OnboardingState): OnboardingFieldKey[] {
+  const missing: OnboardingFieldKey[] = [];
+  if (!state.name) missing.push("name");
+  if (!state.sex || !state.age || !state.heightCm || !state.weightKg)
+    missing.push("body_stats");
+  if (!state.goal) missing.push("goal");
+  if (!state.activity) missing.push("activity");
+  if (missing.length === 0 && !state.consented) missing.push("consent");
+  return missing;
+}
+
+export function isOnboardingComplete(state: OnboardingState): boolean {
+  return getMissingFields(state).length === 0 && state.consented === true;
 }
 
 export interface WaterLog {
@@ -107,6 +124,7 @@ export interface AgentContext {
   localeName: string; // human-readable language name
   locale: string;
   timezone: string;
+  localDate: string; // YYYY-MM-DD in user's timezone
   dailyCalorieTarget: number;
   userProfile: UserProfile | null;
   memories: Record<string, string> | null;

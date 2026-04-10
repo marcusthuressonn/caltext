@@ -10,9 +10,11 @@ export async function saveFavorite(userId: string, name: string, items: MealItem
 
 export async function getFavorite(userId: string, name: string): Promise<MealItem[] | null> {
   const redis = getRedis();
-  const raw = await redis.hget<string>(favoritesKey(userId), name.toLowerCase());
+  const raw = await redis.hget(favoritesKey(userId), name.toLowerCase());
   if (!raw) return null;
-  return JSON.parse(raw) as MealItem[];
+  if (Array.isArray(raw)) return raw as MealItem[];
+  if (typeof raw === "string") return JSON.parse(raw) as MealItem[];
+  return null;
 }
 
 export async function getAllFavorites(userId: string): Promise<string[]> {

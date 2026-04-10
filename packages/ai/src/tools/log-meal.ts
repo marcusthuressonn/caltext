@@ -9,6 +9,7 @@ export const logMeal = tool({
   inputSchema: z.object({
     userId: z.string(),
     timezone: z.string(),
+    mealName: z.string().describe("Short descriptive name for the meal, e.g. 'Greek plate', 'Morning oatmeal', 'Chicken salad lunch'"),
     items: z.array(
       z.object({
         name: z.string(),
@@ -17,7 +18,6 @@ export const logMeal = tool({
         confidence: z.enum(["high", "medium", "low"]),
         notes: z.string().optional(),
         nutrition: z.object({
-          fdcId: z.number().optional(),
           matchedName: z.string(),
           calories: z.number(),
           protein: z.number(),
@@ -30,7 +30,7 @@ export const logMeal = tool({
     photoUrl: z.string().optional(),
     source: z.enum(["photo", "text", "manual"]),
   }),
-  execute: async ({ userId, timezone, items, photoUrl, source }) => {
+  execute: async ({ userId, timezone, mealName, items, photoUrl, source }) => {
     const localDate = localDateString(timezone);
     const id = `meal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -43,6 +43,7 @@ export const logMeal = tool({
     await saveMeal({
       id,
       userId,
+      name: mealName,
       items,
       totalCalories,
       totalProtein,

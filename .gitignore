@@ -8,3 +8,5 @@ dist/
 *.tsbuildinfo
 bun.lock
 .DS_Store
+.workflow-data/
+.swc

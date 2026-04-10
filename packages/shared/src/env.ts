@@ -10,7 +10,6 @@ export const env = createEnv({
     SENDBLUE_WEBHOOK_SECRET: z.string().min(1),
     REDIS_URL: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1),
-    USDA_API_KEY: z.string().min(1),
     ENCRYPTION_KEY: z.string().length(64),
   },
   extends: [vercel(), upstashRedis()],

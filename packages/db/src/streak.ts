@@ -6,11 +6,15 @@ const streakKey = (userId: string) => `streak:${userId}`;
 
 export async function getStreak(userId: string): Promise<StreakInfo> {
   const redis = getRedis();
-  const data = await redis.hgetall<Record<string, string>>(streakKey(userId));
+  const data = await redis.hgetall(streakKey(userId));
+  if (!data || Object.keys(data).length === 0) {
+    return { current: 0, longest: 0, lastLogDate: "" };
+  }
+  const d = data as Record<string, unknown>;
   return {
-    current: parseInt(data?.current ?? "0", 10),
-    longest: parseInt(data?.longest ?? "0", 10),
-    lastLogDate: data?.lastLogDate ?? "",
+    current: Number(d.current ?? 0),
+    longest: Number(d.longest ?? 0),
+    lastLogDate: d.lastLogDate ? String(d.lastLogDate) : "",
   };
 }
 

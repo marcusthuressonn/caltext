@@ -4,6 +4,7 @@ import { getRedis } from "./client";
 import { getMealsForDate } from "./meals";
 
 const dailyKey = (userId: string, localDate: string) => `daily:${userId}:${localDate}`;
+const TTL_90_DAYS = 60 * 60 * 24 * 90;
 
 export async function updateDailyTotals(
   userId: string,
@@ -23,6 +24,7 @@ export async function updateDailyTotals(
   pipeline.hincrbyfloat(key, "fat", addFat);
   pipeline.hincrbyfloat(key, "fiber", addFiber);
   pipeline.hincrby(key, "mealCount", 1);
+  pipeline.expire(key, TTL_90_DAYS);
   await pipeline.exec();
 }
 
@@ -54,15 +56,17 @@ export async function deleteDailyLog(userId: string, localDate: string): Promise
 
 export async function getDailyLog(userId: string, localDate: string): Promise<DailyLog> {
   const redis = getRedis();
-  const data = await redis.hgetall<Record<string, string>>(dailyKey(userId, localDate));
-  const meals = await getMealsForDate(userId, localDate);
+  const [data, meals] = await Promise.all([
+    redis.hgetall(dailyKey(userId, localDate)) as Promise<Record<string, unknown> | null>,
+    getMealsForDate(userId, localDate),
+  ]);
   return {
-    calories: parseFloat(data?.calories ?? "0"),
-    protein: parseFloat(data?.protein ?? "0"),
-    carbs: parseFloat(data?.carbs ?? "0"),
-    fat: parseFloat(data?.fat ?? "0"),
-    fiber: parseFloat(data?.fiber ?? "0"),
-    mealCount: parseInt(data?.mealCount ?? "0", 10),
+    calories: Number(data?.calories ?? 0),
+    protein: Number(data?.protein ?? 0),
+    carbs: Number(data?.carbs ?? 0),
+    fat: Number(data?.fat ?? 0),
+    fiber: Number(data?.fiber ?? 0),
+    mealCount: Number(data?.mealCount ?? 0),
     meals,
   };
 }
@@ -72,12 +76,8 @@ export async function getWeeklyLogs(
   endDate: string,
   _tz: string,
 ): Promise<{ date: string; log: DailyLog }[]> {
-  const results: { date: string; log: DailyLog }[] = [];
   const end = parseISO(endDate);
-  for (let i = 6; i >= 0; i--) {
-    const dateStr = format(subDays(end, i), "yyyy-MM-dd");
-    const log = await getDailyLog(userId, dateStr);
-    results.push({ date: dateStr, log });
-  }
-  return results;
+  const dates = Array.from({ length: 7 }, (_, i) => format(subDays(end, 6 - i), "yyyy-MM-dd"));
+  const logs = await Promise.all(dates.map((d) => getDailyLog(userId, d)));
+  return dates.map((date, i) => ({ date, log: logs[i]! }));
 }

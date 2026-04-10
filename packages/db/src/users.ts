@@ -16,26 +16,27 @@ export async function createPhoneMapping(encryptedPhone: string, userId: string)
 
 export async function getUser(userId: string): Promise<UserProfile | null> {
   const redis = getRedis();
-  const data = await redis.hgetall<Record<string, string>>(userKey(userId));
+  const data = await redis.hgetall(userKey(userId));
   if (!data || Object.keys(data).length === 0) return null;
+  const d = data as Record<string, unknown>;
   return {
     id: userId,
-    phone: data.phone ?? "",
-    name: data.name ?? "",
-    locale: data.locale ?? "en",
-    timezone: data.timezone ?? "UTC",
-    country: data.country ?? "US",
-    dailyCalorieTarget: parseInt(data.dailyCalorieTarget ?? "2000", 10),
-    goal: (data.goal as UserProfile["goal"]) ?? "maintain",
-    activity: (data.activity as UserProfile["activity"]) ?? "moderate",
-    sex: (data.sex as UserProfile["sex"]) ?? "male",
-    age: parseInt(data.age ?? "30", 10),
-    heightCm: parseFloat(data.heightCm ?? "170"),
-    weightKg: parseFloat(data.weightKg ?? "70"),
-    onboardingComplete: data.onboardingComplete === "true",
-    consentedAt: data.consentedAt || null,
-    consentVersion: data.consentVersion || null,
-    createdAt: data.createdAt ?? new Date().toISOString(),
+    phone: String(d.phone ?? ""),
+    name: String(d.name ?? ""),
+    locale: String(d.locale ?? "en"),
+    timezone: String(d.timezone ?? "UTC"),
+    country: String(d.country ?? "US"),
+    dailyCalorieTarget: Number(d.dailyCalorieTarget ?? 2000),
+    goal: (String(d.goal ?? "maintain") as UserProfile["goal"]),
+    activity: (String(d.activity ?? "moderate") as UserProfile["activity"]),
+    sex: (String(d.sex ?? "male") as UserProfile["sex"]),
+    age: Number(d.age ?? 30),
+    heightCm: Number(d.heightCm ?? 170),
+    weightKg: Number(d.weightKg ?? 70),
+    onboardingComplete: String(d.onboardingComplete) === "true",
+    consentedAt: d.consentedAt ? String(d.consentedAt) : null,
+    consentVersion: d.consentVersion ? String(d.consentVersion) : null,
+    createdAt: String(d.createdAt ?? new Date().toISOString()),
   };
 }
 

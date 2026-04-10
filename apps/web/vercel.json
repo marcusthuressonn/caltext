@@ -1,5 +1,5 @@
 {
-  "regions": ["iad1", "lhr1", "hnd1"],
+  "regions": ["iad1", "fra1", "hnd1"],
   "ignoreCommand": "exit 0",
   "bunVersion": "1.x"
 }

@@ -1,4 +1,5 @@
 import { openai } from "@ai-sdk/openai";
+import type { LanguageModelV3 } from "@ai-sdk/provider";
 import { type ModelMessage, stepCountIs, type Tool, ToolLoopAgent } from "ai";
 import { deleteAccountTool } from "./tools/delete-account";
 import { deleteMealTool } from "./tools/delete-meal";
@@ -6,7 +7,7 @@ import { exportDataTool } from "./tools/export-data";
 import { listFavoritesTool, logFavoriteTool, saveFavoriteTool } from "./tools/favorites";
 import { getDailyLogTool, getWeeklyLogTool } from "./tools/get-history";
 import { getUserProfile } from "./tools/get-profile";
-import { identifyFood } from "./tools/identify-food";
+import { createIdentifyFoodTool } from "./tools/identify-food";
 import { logMeal } from "./tools/log-meal";
 import { getWaterLogTool, logWaterTool } from "./tools/log-water";
 import { getWeightHistoryTool, logWeightTool } from "./tools/log-weight";
@@ -29,12 +30,20 @@ function withContext<T extends Tool>(t: T, ctx: AgentSecurityContext): T {
   } as T;
 }
 
-export function createCaltextAgent(systemPrompt: string, ctx: AgentSecurityContext) {
+export interface AgentOptions extends AgentSecurityContext {
+  hasImage?: boolean;
+  imageUrl?: string;
+  model?: LanguageModelV3;
+}
+
+export function createCaltextAgent(systemPrompt: string, ctx: AgentOptions) {
+  const model = ctx.model ?? openai(ctx.hasImage ? "gpt-4.1" : "gpt-4.1-mini");
+
   return new ToolLoopAgent({
-    model: openai("gpt-4.1"),
+    model,
     instructions: systemPrompt,
     tools: {
-      identifyFood,
+      identifyFood: createIdentifyFoodTool(ctx.imageUrl),
       lookupNutrition,
       logMeal: withContext(logMeal, ctx),
       deleteMeal: withContext(deleteMealTool, ctx),
@@ -56,7 +65,7 @@ export function createCaltextAgent(systemPrompt: string, ctx: AgentSecurityConte
       saveMemory: withContext(saveMemoryTool, ctx),
       recallMemory: withContext(recallMemoryTool, ctx),
     },
-    stopWhen: stepCountIs(15),
+    stopWhen: stepCountIs(8),
   });
 }
 

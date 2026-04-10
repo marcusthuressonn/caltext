@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { calculateBMR, calculateTDEE } from "../constants";
+import { calculateBMR, calculateTDEE, MIN_DAILY_CALORIES, MAX_DAILY_CALORIES } from "../constants";
 
 describe("calculateBMR (Mifflin-St Jeor)", () => {
   test("male — 80kg, 180cm, age 30", () => {
@@ -26,10 +26,10 @@ describe("calculateTDEE", () => {
     );
   });
 
-  test("female, sedentary, lose weight", () => {
-    // BMR = 1395.25, TDEE = 1395.25 * 1.2 - 500 = 1174
+  test("female, sedentary, lose weight — clamped to minimum", () => {
+    // BMR = 1395.25, raw = 1395.25 * 1.2 - 500 = 1174, clamped to 1200
     expect(calculateTDEE("female", 65, 165, 25, "sedentary", "lose")).toBe(
-      Math.round(1395.25 * 1.2 - 500),
+      MIN_DAILY_CALORIES,
     );
   });
 
@@ -43,5 +43,14 @@ describe("calculateTDEE", () => {
   test("unknown activity/goal falls back to moderate/0", () => {
     // BMR = 1780, TDEE = 1780 * 1.55 = 2759
     expect(calculateTDEE("male", 80, 180, 30, "unknown", "unknown")).toBe(Math.round(1780 * 1.55));
+  });
+
+  test("clamps to minimum when result is dangerously low", () => {
+    // Near-zero height → tiny BMR → raw TDEE well below 1200
+    expect(calculateTDEE("male", 90, 5, 36, "active", "lose")).toBe(MIN_DAILY_CALORIES);
+  });
+
+  test("clamps to maximum when result is unreasonably high", () => {
+    expect(calculateTDEE("male", 300, 250, 18, "very_active", "gain")).toBe(MAX_DAILY_CALORIES);
   });
 });

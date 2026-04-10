@@ -17,7 +17,6 @@ const mealItemSchema = z.object({
   confidence: z.enum(["high", "medium", "low"]),
   notes: z.string().optional(),
   nutrition: z.object({
-    fdcId: z.number().optional(),
     matchedName: z.string(),
     calories: z.number(),
     protein: z.number(),

@@ -6,21 +6,23 @@ const TTL_24H = 60 * 60 * 24;
 
 export async function getOnboardingState(userId: string): Promise<OnboardingState | null> {
   const redis = getRedis();
-  const data = await redis.hgetall<Record<string, string>>(onboardingKey(userId));
-  if (!data?.step) return null;
-  return {
-    step: data.step as OnboardingState["step"],
-    name: data.name,
-    timezone: data.timezone,
-    sex: data.sex as OnboardingState["sex"],
-    age: data.age ? parseInt(data.age, 10) : undefined,
-    heightCm: data.heightCm ? parseFloat(data.heightCm) : undefined,
-    weightKg: data.weightKg ? parseFloat(data.weightKg) : undefined,
-    goal: data.goal as OnboardingState["goal"],
-    activity: data.activity as OnboardingState["activity"],
-    calculatedTarget: data.calculatedTarget ? parseInt(data.calculatedTarget, 10) : undefined,
-    webhookUrl: data.webhookUrl,
-  };
+  const data = await redis.hgetall(onboardingKey(userId));
+  if (!data || Object.keys(data).length === 0) return null;
+  const d = data as Record<string, unknown>;
+  const result: OnboardingState = {};
+  if (d.name) result.name = String(d.name);
+  if (String(d.timezoneConfirmed) === "true") result.timezoneConfirmed = true;
+  if (d.timezone) result.timezone = String(d.timezone);
+  if (d.sex) result.sex = String(d.sex) as OnboardingState["sex"];
+  if (d.age) result.age = Number(d.age);
+  if (d.heightCm) result.heightCm = Number(d.heightCm);
+  if (d.weightKg) result.weightKg = Number(d.weightKg);
+  if (d.goal) result.goal = String(d.goal) as OnboardingState["goal"];
+  if (d.activity) result.activity = String(d.activity) as OnboardingState["activity"];
+  if (String(d.consented) === "true") result.consented = true;
+  if (d.detectedLocale) result.detectedLocale = String(d.detectedLocale);
+  if (d.lastBotReply) result.lastBotReply = String(d.lastBotReply);
+  return result;
 }
 
 export async function setOnboardingState(

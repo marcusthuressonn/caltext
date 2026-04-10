@@ -5,23 +5,25 @@
   "type": "module",
   "scripts": {
     "dev": "nitro dev",
+    "dev:inspect": "workflow inspect runs --web",
     "build": "nitro build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.52",
     "@caltext/ai": "*",
     "@caltext/db": "*",
     "@caltext/shared": "*",
+    "@workflow/ai": "^4.1.0",
+    "ai": "^6.0.156",
+    "evlog": "^2.11.1",
+    "heic-convert": "^2.1.0",
     "hono": "^4.12.12",
     "nitro": "^3.0.260311-beta",
     "rollup": "^4.60.1",
+    "sendblue": "^3.7.0",
+    "sharp": "^0.34.5",
     "workflow": "^4.2.0",
-    "@workflow/ai": "^4.1.0",
-    "chat": "^4.24.0",
-    "chat-adapter-sendblue": "^0.2.0",
-    "@chat-adapter/state-redis": "^4.24.0",
-    "ai": "^6.0.154",
-    "@ai-sdk/openai": "^3.0.52",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -1,44 +1,113 @@
+import { getRedis } from "@caltext/db";
 import { encrypt } from "@caltext/shared";
-import type { Message, Thread } from "chat";
+import { createLogger, initLogger, type RequestLogger } from "evlog";
+import { type EvlogVariables, evlog } from "evlog/hono";
 import { Hono } from "hono";
-import bot from "./bot";
+import { normalizeImageUrl } from "./image";
+import { withLock } from "./lock";
 import { routeMessage } from "./router";
+import { sendMessage, sendTyping } from "./sendblue";
 
-const app = new Hono();
+initLogger({ env: { service: "caltext" } });
+
+async function isDuplicate(messageId: string): Promise<boolean> {
+  const redis = getRedis();
+  const key = `dedup:${messageId}`;
+  const wasNew = await redis.set(key, "1", { nx: true, ex: 300 });
+  return !wasNew;
+}
+
+const app = new Hono<EvlogVariables>();
+app.use(evlog());
+
+interface SendblueWebhook {
+  is_outbound: boolean;
+  status: string;
+  content?: string;
+  media_url?: string;
+  from_number?: string;
+  number?: string;
+  message_handle?: string;
+}
 
 app.get("/health", (c) => c.json({ status: "ok", service: "caltext" }));
 
 app.post("/webhooks/sendblue", async (c) => {
-  return bot.webhooks.sendblue(c.req.raw);
+  const log = c.get("log");
+  try {
+    const body = await c.req.json<SendblueWebhook>();
+
+    if (body.is_outbound || body.status !== "RECEIVED") {
+      return c.json({ ok: true });
+    }
+
+    const messageId = body.message_handle;
+    if (messageId && (await isDuplicate(messageId))) {
+      log.set({ skipped: "duplicate", messageId });
+      return c.json({ ok: true });
+    }
+
+    const phone = body.number;
+    if (!phone) {
+      log.set({ skipped: "no_phone" });
+      return c.json({ ok: true });
+    }
+
+    const text = body.content ?? "";
+    const rawImageUrl = body.media_url || undefined;
+
+    if (!text && !rawImageUrl) {
+      log.set({ skipped: "empty" });
+      return c.json({ ok: true });
+    }
+
+    // Fire-and-forget: process message in background so webhook returns quickly
+    handleIncoming(phone, text, rawImageUrl);
+
+    return c.json({ ok: true });
+  } catch (error) {
+    log.error(error as Error);
+    return c.json({ error: "webhook failed" }, 500);
+  }
 });
 
-async function handleIncoming(thread: Thread, message: Message) {
-  const rawPhone = thread.id.split(":")[1] ?? "";
-  const encryptedPhone = await encrypt(rawPhone);
-  const text = message.text ?? "";
-  const imageUrl = message.attachments?.[0]?.url;
+async function handleIncoming(phone: string, text: string, rawImageUrl?: string) {
+  const log: RequestLogger = createLogger({
+    scope: "message",
+    phone: phone.slice(-4),
+  });
 
-  await thread.startTyping();
+  const lockResult = await withLock(phone, async () => {
+    try {
+      log.set({ input: { text: text.slice(0, 80), hasImage: !!rawImageUrl } });
 
-  try {
-    const result = await routeMessage(encryptedPhone, text, imageUrl);
-    if (!result.startsWith("__")) {
-      await thread.post(result);
+      const imageUrl = rawImageUrl ? await normalizeImageUrl(rawImageUrl, log) : undefined;
+
+      const encryptedPhone = await encrypt(phone);
+      sendTyping(phone);
+
+      const replies = await routeMessage(log, encryptedPhone, text, imageUrl);
+      for (const reply of replies) {
+        await sendMessage(phone, reply);
+      }
+
+      log.set({ output: { replies: replies.length } });
+    } catch (error) {
+      log.error(error as Error);
+      try {
+        await sendMessage(phone, "Oops, something went wrong. Try again in a sec! 🙏");
+      } catch {
+        // swallow send failure for error message
+      }
+    } finally {
+      log.emit();
     }
-  } catch (error) {
-    console.error("Error routing message:", error);
-    await thread.post("Oops, something went wrong. Try again in a sec! 🙏");
+  });
+
+  if (lockResult === null) {
+    log.set({ skipped: "locked" });
+    log.emit();
   }
 }
-
-bot.onDirectMessage(async (thread, message) => {
-  await thread.subscribe();
-  await handleIncoming(thread, message);
-});
-
-bot.onSubscribedMessage(async (thread, message) => {
-  if (message.author?.isBot) return;
-  await handleIncoming(thread, message);
-});
 
 export default app;

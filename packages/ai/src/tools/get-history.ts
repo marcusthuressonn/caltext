@@ -4,10 +4,10 @@ import { z } from "zod";
 
 export const getDailyLogTool = tool({
   description:
-    "Get today's meal log with running totals for the user. Shows all meals logged today and current calorie/macro totals.",
+    "Get today's meal log with running totals. Always returns TODAY's data -- no date parameter needed.",
   inputSchema: z.object({
     userId: z.string(),
-    localDate: z.string().describe("The date in YYYY-MM-DD format in the user's timezone"),
+    localDate: z.string(),
   }),
   execute: async ({ userId, localDate }) => {
     return await getDailyLog(userId, localDate);

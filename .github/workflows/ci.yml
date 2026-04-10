@@ -49,15 +49,12 @@ jobs:
 
       - name: Pull Vercel Environment
         run: vercel pull --yes --token=$VERCEL_TOKEN --environment=production
-        working-directory: apps/web
 
       - name: Build
         run: vercel build --prod --token=$VERCEL_TOKEN
-        working-directory: apps/web
 
       - name: Deploy
         run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
-        working-directory: apps/web
 
   deploy-api:
     needs: ci
@@ -81,15 +78,12 @@ jobs:
 
       - name: Pull Vercel Environment
         run: vercel pull --yes --token=$VERCEL_TOKEN --environment=production
-        working-directory: apps/api
 
       - name: Build
         run: vercel build --prod --token=$VERCEL_TOKEN
-        working-directory: apps/api
 
       - name: Deploy
         run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
-        working-directory: apps/api
 
   deploy-preview:
     needs: ci
@@ -116,4 +110,3 @@ jobs:
           vercel pull --yes --token=$VERCEL_TOKEN --environment=preview
           vercel build --token=$VERCEL_TOKEN
           vercel deploy --prebuilt --token=$VERCEL_TOKEN
-        working-directory: apps/web

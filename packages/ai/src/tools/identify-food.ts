@@ -1,5 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import { generateObject, tool } from "ai";
+import { log } from "evlog";
 import { z } from "zod";
 
 export const nutritionLabelSchema = z.object({
@@ -22,17 +23,17 @@ export const foodIdentificationSchema = z.object({
         .string()
         .describe("How it appears prepared: raw, grilled, fried, boiled, etc."),
       confidence: z.enum(["high", "medium", "low"]),
-      notes: z.string().optional().describe("Anything uncertain, e.g. 'could be diet or regular'"),
+      notes: z.string().nullable().describe("Anything uncertain, e.g. 'could be diet or regular'. Null if nothing to note."),
     }),
   ),
   sceneContext: z
     .string()
-    .optional()
-    .describe("Visible reference objects: plate size, utensils, hands"),
+    .nullable()
+    .describe("Visible reference objects: plate size, utensils, hands. Null if none."),
   nutritionLabel: nutritionLabelSchema
-    .optional()
+    .nullable()
     .describe(
-      "Present only when a nutrition facts label is visible on a packaged product. Do NOT populate items when this is set.",
+      "Present only when a nutrition facts label is visible on a packaged product. Do NOT populate items when this is set. Null for plates of food.",
     ),
 });
 
@@ -62,27 +63,66 @@ If you see a packaged food or drink product:
 
 Return your analysis as structured JSON.`;
 
-export const identifyFood = tool({
-  description:
-    "Analyze a food photo to identify items and estimate portion sizes, OR read nutrition facts from a packaged product label.",
-  inputSchema: z.object({
-    imageUrl: z.string().describe("URL of the food photo to analyze"),
-  }),
-  execute: async ({ imageUrl }) => {
-    const result = await generateObject({
-      model: openai("gpt-4.1"),
-      schema: foodIdentificationSchema,
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: FOOD_IDENTIFICATION_PROMPT },
-            { type: "image", image: new URL(imageUrl) },
-          ],
-        },
-      ],
-    });
+export function createIdentifyFoodTool(contextImageUrl?: string) {
+  return tool({
+    description:
+      "Analyze the user's food photo to identify items and estimate portion sizes, OR read nutrition facts from a packaged product label. The image is provided automatically -- no parameters needed.",
+    inputSchema: z.object({}),
+    execute: async () => {
+      if (!contextImageUrl) {
+        return { error: "No image provided", items: [] };
+      }
 
-    return result.object;
-  },
-});
+      try {
+        let dataUrl: string;
+        if (contextImageUrl.startsWith("data:")) {
+          dataUrl = contextImageUrl;
+        } else {
+          const imageResponse = await fetch(contextImageUrl);
+          if (!imageResponse.ok) {
+            return { error: `Could not fetch image (${imageResponse.status})`, items: [] };
+          }
+          const buffer = await imageResponse.arrayBuffer();
+          const base64 = Buffer.from(buffer).toString("base64");
+          const contentType = imageResponse.headers.get("content-type") ?? "image/jpeg";
+          dataUrl = `data:${contentType};base64,${base64}`;
+        }
+
+        const result = await generateObject({
+          model: openai("gpt-4.1-mini"),
+          schema: foodIdentificationSchema,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: FOOD_IDENTIFICATION_PROMPT },
+                { type: "image", image: new URL(dataUrl) },
+              ],
+            },
+          ],
+        });
+
+        const obj = result.object;
+        log.info({
+          tool: "identifyFood",
+          itemCount: obj.items.length,
+          items: obj.items.map((i) => ({
+            name: i.name,
+            grams: i.estimatedGrams,
+            prep: i.preparationMethod,
+            confidence: i.confidence,
+            ...(i.notes ? { notes: i.notes } : {}),
+          })),
+          sceneContext: obj.sceneContext,
+          hasNutritionLabel: !!obj.nutritionLabel,
+          ...(obj.nutritionLabel ? { label: obj.nutritionLabel } : {}),
+        });
+
+        return obj;
+      } catch (err) {
+        log.error({ tool: "identifyFood", err: String(err) });
+        return { error: String(err), items: [] };
+      }
+    },
+  });
+}

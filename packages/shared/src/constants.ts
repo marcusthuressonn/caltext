@@ -47,6 +47,9 @@ export function calculateBMR(
   return 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
 }
 
+export const MIN_DAILY_CALORIES = 1200;
+export const MAX_DAILY_CALORIES = 5000;
+
 export function calculateTDEE(
   sex: "male" | "female",
   weightKg: number,
@@ -58,5 +61,6 @@ export function calculateTDEE(
   const bmr = calculateBMR(sex, weightKg, heightCm, age);
   const multiplier = ACTIVITY_MULTIPLIERS[activity] ?? 1.55;
   const adjustment = GOAL_ADJUSTMENTS[goal] ?? 0;
-  return Math.round(bmr * multiplier + adjustment);
+  const raw = Math.round(bmr * multiplier + adjustment);
+  return Math.max(MIN_DAILY_CALORIES, Math.min(MAX_DAILY_CALORIES, raw));
 }

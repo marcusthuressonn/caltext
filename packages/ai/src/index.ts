@@ -1,5 +1,13 @@
 export { type AgentSecurityContext, createCaltextAgent, type ModelMessage } from "./agent";
 export {
+  getMissingFields,
+  isOnboardingComplete,
+  type OnboardingFieldKey,
+  type OnboardingContext,
+  type OnboardingResult,
+  processOnboardingMessage,
+} from "./onboarding";
+export {
   buildDailySummaryPrompt,
   buildReminderPrompt,
   buildSystemPrompt,
@@ -14,7 +22,7 @@ export { getUserProfile } from "./tools/get-profile";
 export {
   FOOD_IDENTIFICATION_PROMPT,
   foodIdentificationSchema,
-  identifyFood,
+  createIdentifyFoodTool,
 } from "./tools/identify-food";
 export { logMeal } from "./tools/log-meal";
 export { getWaterLogTool, logWaterTool } from "./tools/log-water";

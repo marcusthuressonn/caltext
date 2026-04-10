@@ -34,9 +34,11 @@ export async function setCustomReminderTimes(
 
 export async function getCustomReminderTimes(userId: string): Promise<CustomReminderTime[] | null> {
   const redis = getRedis();
-  const raw = await redis.get<string>(reminderTimesKey(userId));
+  const raw = await redis.get(reminderTimesKey(userId));
   if (!raw) return null;
-  return JSON.parse(raw) as CustomReminderTime[];
+  if (Array.isArray(raw)) return raw as CustomReminderTime[];
+  if (typeof raw === "string") return JSON.parse(raw) as CustomReminderTime[];
+  return null;
 }
 
 export async function deleteCustomReminderTimes(userId: string): Promise<void> {
