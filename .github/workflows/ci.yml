@@ -48,13 +48,13 @@ jobs:
         run: bun add -g vercel
 
       - name: Pull Vercel Environment
-        run: vercel pull --yes --token=$VERCEL_TOKEN --environment=production --cwd apps/web
+        run: vercel pull --yes --token=$VERCEL_TOKEN --environment=production
 
       - name: Build
-        run: vercel build --prod --token=$VERCEL_TOKEN --cwd apps/web
+        run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy
-        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --cwd apps/web
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 
   deploy-api:
     needs: ci
@@ -77,13 +77,13 @@ jobs:
         run: bun add -g vercel
 
       - name: Pull Vercel Environment
-        run: vercel pull --yes --token=$VERCEL_TOKEN --environment=production --cwd apps/api
+        run: vercel pull --yes --token=$VERCEL_TOKEN --environment=production
 
       - name: Build
-        run: vercel build --prod --token=$VERCEL_TOKEN --cwd apps/api
+        run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy
-        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --cwd apps/api
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 
   deploy-preview:
     needs: ci
@@ -107,6 +107,6 @@ jobs:
 
       - name: Deploy Web Preview
         run: |
-          vercel pull --yes --token=$VERCEL_TOKEN --environment=preview --cwd apps/web
-          vercel build --token=$VERCEL_TOKEN --cwd apps/web
-          vercel deploy --prebuilt --token=$VERCEL_TOKEN --cwd apps/web
+          vercel pull --yes --token=$VERCEL_TOKEN --environment=preview
+          vercel build --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --token=$VERCEL_TOKEN
