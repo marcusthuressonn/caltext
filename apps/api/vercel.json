@@ -1,5 +1,6 @@
 {
   "regions": ["iad1", "fra1", "hnd1"],
+  "installCommand": "bun install --frozen-lockfile",
   "buildCommand": "cd ../.. && turbo build --filter=@caltext/api",
   "outputDirectory": ".output",
   "ignoreCommand": "exit 0",
