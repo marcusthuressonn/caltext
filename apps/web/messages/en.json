@@ -20,7 +20,8 @@
   },
   "IMessageButton": {
     "label": "Get Started in Messages",
-    "shortLabel": "Get Started"
+    "shortLabel": "Get Started",
+    "smsBody": "Hey!"
   },
   "Features": {
     "heading": "Everything happens in your texts",

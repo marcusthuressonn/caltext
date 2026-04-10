@@ -13,6 +13,7 @@ app.get("/health", (c) => c.json({ status: "ok", service: "caltext" }));
 
 app.post("/webhooks/sendblue", async (c) => {
   const log = c.get("log");
+
   try {
     const msg = parseInbound(c.req.raw.headers, await c.req.json());
     if (!msg) return c.json({ ok: true });

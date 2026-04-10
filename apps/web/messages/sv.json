@@ -20,7 +20,8 @@
   },
   "IMessageButton": {
     "label": "Kom igång i Meddelanden",
-    "shortLabel": "Kom igång"
+    "shortLabel": "Kom igång",
+    "smsBody": "Hej!"
   },
   "Features": {
     "heading": "Allt händer i dina sms",

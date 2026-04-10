@@ -8,6 +8,8 @@ const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER ?? "+1XXXXXXXXXX";
 
 export function BottomCta() {
   const t = useTranslations("BottomCta");
+  const smsBody = useTranslations("IMessageButton")("smsBody");
+  const smsHref = `sms:${PHONE_NUMBER}&body=${encodeURIComponent(smsBody)}`;
 
   return (
     <section id="get-started" className="py-20 sm:py-28">
@@ -30,7 +32,7 @@ export function BottomCta() {
             <div className="flex flex-col items-center gap-3">
               <div className="rounded-2xl border border-border p-3">
                 <QRCodeSVG
-                  value={`sms:${PHONE_NUMBER}`}
+                  value={smsHref}
                   size={120}
                   level="M"
                   bgColor="#f6f4f1"
