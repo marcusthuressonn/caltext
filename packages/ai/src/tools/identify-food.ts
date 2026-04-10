@@ -24,6 +24,13 @@ export const foodIdentificationSchema = z.object({
         .describe("How it appears prepared: raw, grilled, fried, boiled, etc."),
       confidence: z.enum(["high", "medium", "low"]),
       notes: z.string().nullable().describe("Anything uncertain, e.g. 'could be diet or regular'. Null if nothing to note."),
+      nutrition: z.object({
+        calories: z.number().describe("Estimated kcal for this item at the estimated weight"),
+        protein: z.number().describe("Estimated grams of protein"),
+        carbs: z.number().describe("Estimated grams of carbohydrates"),
+        fat: z.number().describe("Estimated grams of fat"),
+        fiber: z.number().describe("Estimated grams of fiber"),
+      }).describe("Nutrition estimate for this item at the estimated gram weight"),
     }),
   ),
   sceneContext: z
@@ -42,7 +49,7 @@ export type FoodIdentification = z.infer<typeof foodIdentificationSchema>;
 export const FOOD_IDENTIFICATION_PROMPT = `Analyze this food photo. There are two modes depending on what you see:
 
 MODE 1 — PLATE OF FOOD (no packaging):
-Identify each food item and estimate weight in grams. Do NOT guess calorie counts -- a nutrition database will handle that.
+Identify each food item, estimate weight in grams, and estimate nutrition (calories, protein, carbs, fat, fiber) for that weight.
 
 Use visible objects as size references:
 - Standard dinner plate = ~26cm diameter
@@ -51,7 +58,9 @@ Use visible objects as size references:
 
 For each item, estimate the weight in grams. Be conservative -- it's better to slightly overestimate than underestimate. If you're uncertain about an item (e.g., "is that mayo or yogurt?"), flag it with low confidence and a note.
 
-Return items in the "items" array. Leave "nutritionLabel" empty.
+For nutrition estimates, use your knowledge of typical nutritional values per 100g and scale to the estimated gram weight. Be accurate -- these are for calorie tracking.
+
+Return items in the "items" array with their nutrition. Leave "nutritionLabel" empty.
 
 MODE 2 — PACKAGED PRODUCT (bottle, can, box, jar, bag, protein bar, etc.):
 If you see a packaged food or drink product:
@@ -59,14 +68,14 @@ If you see a packaged food or drink product:
 - If a nutrition facts label is visible, read the EXACT values printed on it: calories, protein, carbs, fat, fiber, and serving size
 - Convert the serving size to grams (e.g. "250ml milk" ≈ 258g, "1 bar (40g)" = 40g)
 - Return these in the "nutritionLabel" field. Leave the "items" array empty.
-- If the nutrition label is not visible or too blurry to read, identify the product by name and return it as a single item in the "items" array with your best weight estimate.
+- If the nutrition label is not visible or too blurry to read, identify the product by name and return it as a single item in the "items" array with your best weight and nutrition estimate.
 
 Return your analysis as structured JSON.`;
 
 export function createIdentifyFoodTool(contextImageUrl?: string) {
   return tool({
     description:
-      "Analyze the user's food photo to identify items and estimate portion sizes, OR read nutrition facts from a packaged product label. The image is provided automatically -- no parameters needed.",
+      "Analyze the user's food photo to identify items, estimate portion sizes, and estimate nutrition (calories + macros) per item. Also reads nutrition facts from packaged product labels. The image is provided automatically -- no parameters needed.",
     inputSchema: z.object({}),
     execute: async () => {
       if (!contextImageUrl) {
@@ -111,6 +120,10 @@ export function createIdentifyFoodTool(contextImageUrl?: string) {
             grams: i.estimatedGrams,
             prep: i.preparationMethod,
             confidence: i.confidence,
+            kcal: i.nutrition.calories,
+            p: i.nutrition.protein,
+            c: i.nutrition.carbs,
+            f: i.nutrition.fat,
             ...(i.notes ? { notes: i.notes } : {}),
           })),
           sceneContext: obj.sceneContext,

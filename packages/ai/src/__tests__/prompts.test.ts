@@ -37,6 +37,7 @@ const baseContext = {
   localeName: "English",
   locale: "en",
   timezone: "America/New_York",
+  localDate: "2026-04-08",
   dailyCalorieTarget: 2000,
   userProfile: baseProfile,
   memories: null,
@@ -54,7 +55,7 @@ describe("buildSystemPrompt", () => {
     const prompt = buildSystemPrompt(makeContext());
     expect(prompt).toContain("Caltext");
     expect(prompt).toContain("English");
-    expect(prompt).toContain("Supportive friend");
+    expect(prompt).toContain("Chill and minimal");
   });
 
   test("includes user profile when present", () => {
@@ -98,9 +99,9 @@ describe("buildSystemPrompt", () => {
 
   test("omits streak section when null or <= 1", () => {
     const prompt = buildSystemPrompt(makeContext({ streak: 1 }));
-    expect(prompt).not.toContain("Current tracking streak");
+    expect(prompt).not.toContain("Streak:");
     const prompt2 = buildSystemPrompt(makeContext({ streak: null }));
-    expect(prompt2).not.toContain("Current tracking streak");
+    expect(prompt2).not.toContain("Streak:");
   });
 
   test("responds in Swedish when locale is sv", () => {
@@ -116,8 +117,8 @@ describe("buildSystemPrompt", () => {
 
   test("includes confirmation step instructions", () => {
     const prompt = buildSystemPrompt(makeContext());
-    expect(prompt).toContain("Should I log this?");
-    expect(prompt).toContain("Only call logMeal after the user confirms");
+    expect(prompt).toContain("Log it?");
+    expect(prompt).toContain("logMeal");
   });
 
   test("includes water tracking instructions", () => {

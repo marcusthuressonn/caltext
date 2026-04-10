@@ -88,9 +88,11 @@ export async function getMealsForDate(userId: string, localDate: string): Promis
   const mealIds = await redis.zrange<string[]>(mealsIndexKey(userId, localDate), 0, -1);
   if (!mealIds || mealIds.length === 0) return [];
 
-  const results = await Promise.all(
-    mealIds.map((id) => redis.hgetall(mealKey(id))),
-  );
+  const pipeline = redis.pipeline();
+  for (const id of mealIds) {
+    pipeline.hgetall(mealKey(id));
+  }
+  const results = await pipeline.exec();
 
   const meals: MealEntry[] = [];
   for (let i = 0; i < mealIds.length; i++) {

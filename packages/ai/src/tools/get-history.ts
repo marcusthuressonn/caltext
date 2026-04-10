@@ -20,9 +20,8 @@ export const getWeeklyLogTool = tool({
   inputSchema: z.object({
     userId: z.string(),
     endDate: z.string().describe("The end date in YYYY-MM-DD format"),
-    timezone: z.string(),
   }),
-  execute: async ({ userId, endDate, timezone }) => {
-    return await getWeeklyLogs(userId, endDate, timezone);
+  execute: async ({ userId, endDate }) => {
+    return await getWeeklyLogs(userId, endDate);
   },
 });

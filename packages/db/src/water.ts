@@ -7,8 +7,10 @@ const TTL_90_DAYS = 60 * 60 * 24 * 90;
 export async function logWater(userId: string, localDate: string, ml: number): Promise<void> {
   const redis = getRedis();
   const key = waterKey(userId, localDate);
-  await redis.hincrbyfloat(key, "totalMl", ml);
-  await redis.expire(key, TTL_90_DAYS);
+  const pipeline = redis.pipeline();
+  pipeline.hincrbyfloat(key, "totalMl", ml);
+  pipeline.expire(key, TTL_90_DAYS);
+  await pipeline.exec();
 }
 
 export async function getWaterLog(userId: string, localDate: string): Promise<WaterLog> {

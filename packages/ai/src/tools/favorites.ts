@@ -9,22 +9,7 @@ import type { MealItem } from "@caltext/shared";
 import { localDateString } from "@caltext/shared";
 import { tool } from "ai";
 import { z } from "zod";
-
-const mealItemSchema = z.object({
-  name: z.string(),
-  estimatedGrams: z.number(),
-  preparationMethod: z.string(),
-  confidence: z.enum(["high", "medium", "low"]),
-  notes: z.string().optional(),
-  nutrition: z.object({
-    matchedName: z.string(),
-    calories: z.number(),
-    protein: z.number(),
-    carbs: z.number(),
-    fat: z.number(),
-    fiber: z.number(),
-  }),
-});
+import { aggregateMealTotals, mealItemSchema } from "./schemas";
 
 export const saveFavoriteTool = tool({
   description:
@@ -70,22 +55,13 @@ export const logFavoriteTool = tool({
 
     const localDate = localDateString(timezone);
     const id = `meal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-
-    const totalCalories = items.reduce((s, i) => s + i.nutrition.calories, 0);
-    const totalProtein = items.reduce((s, i) => s + i.nutrition.protein, 0);
-    const totalCarbs = items.reduce((s, i) => s + i.nutrition.carbs, 0);
-    const totalFat = items.reduce((s, i) => s + i.nutrition.fat, 0);
-    const totalFiber = items.reduce((s, i) => s + i.nutrition.fiber, 0);
+    const totals = aggregateMealTotals(items);
 
     await saveMeal({
       id,
       userId,
       items,
-      totalCalories,
-      totalProtein,
-      totalCarbs,
-      totalFat,
-      totalFiber,
+      ...totals,
       source: "manual",
       timestamp: new Date().toISOString(),
       localDate,
@@ -94,21 +70,21 @@ export const logFavoriteTool = tool({
     await updateDailyTotals(
       userId,
       localDate,
-      totalCalories,
-      totalProtein,
-      totalCarbs,
-      totalFat,
-      totalFiber,
+      totals.totalCalories,
+      totals.totalProtein,
+      totals.totalCarbs,
+      totals.totalFat,
+      totals.totalFiber,
     );
 
     return {
       logged: true,
       mealId: id,
       name,
-      totalCalories,
-      totalProtein: Math.round(totalProtein * 10) / 10,
-      totalCarbs: Math.round(totalCarbs * 10) / 10,
-      totalFat: Math.round(totalFat * 10) / 10,
+      totalCalories: totals.totalCalories,
+      totalProtein: Math.round(totals.totalProtein * 10) / 10,
+      totalCarbs: Math.round(totals.totalCarbs * 10) / 10,
+      totalFat: Math.round(totals.totalFat * 10) / 10,
     };
   },
 });

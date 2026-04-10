@@ -46,6 +46,7 @@ export async function subtractDailyTotals(
   pipeline.hincrbyfloat(key, "fat", -fat);
   pipeline.hincrbyfloat(key, "fiber", -fiber);
   pipeline.hincrby(key, "mealCount", -1);
+  pipeline.expire(key, TTL_90_DAYS);
   await pipeline.exec();
 }
 
@@ -74,7 +75,6 @@ export async function getDailyLog(userId: string, localDate: string): Promise<Da
 export async function getWeeklyLogs(
   userId: string,
   endDate: string,
-  _tz: string,
 ): Promise<{ date: string; log: DailyLog }[]> {
   const end = parseISO(endDate);
   const dates = Array.from({ length: 7 }, (_, i) => format(subDays(end, 6 - i), "yyyy-MM-dd"));

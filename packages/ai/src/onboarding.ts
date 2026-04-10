@@ -4,8 +4,6 @@ import type { OnboardingState } from "@caltext/shared";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 
-export { getMissingFields, isOnboardingComplete, type OnboardingFieldKey } from "@caltext/shared";
-
 const defaultModel = openai("gpt-4.1-mini");
 
 const extractionSchema = z.object({

@@ -14,12 +14,12 @@ export async function saveConversationMessages(userId: string, messages: unknown
   );
 }
 
-export async function getConversationMessages(userId: string): Promise<unknown[]> {
+export async function getConversationMessages<T = unknown>(userId: string): Promise<T[]> {
   const redis = getRedis();
   const raw = await redis.get(messagesKey(userId));
   if (!raw) return [];
   if (Array.isArray(raw)) return raw;
-  if (typeof raw === "string") return JSON.parse(raw) as unknown[];
+  if (typeof raw === "string") return JSON.parse(raw) as T[];
   return [];
 }
 

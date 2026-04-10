@@ -1,5 +1,5 @@
 import { createPhoneMapping, getUser, resolveUserId } from "@caltext/db";
-import { decrypt, detectRegion, generateId } from "@caltext/shared";
+import { detectRegion, generateId } from "@caltext/shared";
 import type { RequestLogger } from "evlog";
 import { handleMessage } from "./handlers/message";
 import { handleOnboarding } from "./handlers/onboarding";
@@ -7,6 +7,7 @@ import { handleOnboarding } from "./handlers/onboarding";
 export async function routeMessage(
   log: RequestLogger,
   encryptedPhone: string,
+  rawPhone: string,
   text: string,
   imageUrl?: string,
 ): Promise<string[]> {
@@ -24,7 +25,7 @@ export async function routeMessage(
 
   if (!user?.onboardingComplete) {
     log.set({ route: "onboarding" });
-    const region = !user ? detectRegion(await decrypt(encryptedPhone)) : null;
+    const region = !user ? detectRegion(rawPhone) : null;
     return handleOnboarding(
       log,
       userId,
@@ -44,6 +45,6 @@ export async function routeMessage(
   }
 
   log.set({ route: "message" });
-  const reply = await handleMessage(log, userId, text, imageUrl);
+  const reply = await handleMessage(log, user, text, imageUrl);
   return reply ? [reply] : [];
 }

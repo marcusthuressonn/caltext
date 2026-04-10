@@ -73,7 +73,6 @@ caltext/
         handle-message.ts # Main message handler
         onboarding.ts     # Multi-step onboarding
         reminder-loop.ts  # Daily reminders + summaries
-        daily-summary.ts  # Standalone summary trigger
   packages/
     ai/                   # AI agent + tools
     db/                   # Upstash Redis data layer

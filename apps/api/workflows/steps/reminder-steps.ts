@@ -102,7 +102,7 @@ export async function generateWeeklyRecap(userId: string, locale: string): Promi
   if (!user) return null;
 
   const localDate = localDateString(user.timezone);
-  const weeklyLogs = await getWeeklyLogs(userId, localDate, user.timezone);
+  const weeklyLogs = await getWeeklyLogs(userId, localDate);
 
   const dayLines = weeklyLogs
     .map(({ date, log }) => {

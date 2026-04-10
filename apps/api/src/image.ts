@@ -2,7 +2,7 @@ import type { RequestLogger } from "evlog";
 import convert from "heic-convert";
 import sharp from "sharp";
 
-const MAX_DIMENSION = 1536;
+const MAX_DIMENSION = 1024;
 
 async function heicToJpeg(buffer: Buffer): Promise<Buffer> {
   const output = await convert({ buffer, format: "JPEG", quality: 0.9 });

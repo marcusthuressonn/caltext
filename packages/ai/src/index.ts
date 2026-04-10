@@ -1,8 +1,5 @@
 export { type AgentSecurityContext, createCaltextAgent, type ModelMessage } from "./agent";
 export {
-  getMissingFields,
-  isOnboardingComplete,
-  type OnboardingFieldKey,
   type OnboardingContext,
   type OnboardingResult,
   processOnboardingMessage,

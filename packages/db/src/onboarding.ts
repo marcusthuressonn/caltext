@@ -34,8 +34,11 @@ export async function setOnboardingState(
   for (const [k, v] of Object.entries(state)) {
     if (v !== undefined) flat[k] = String(v);
   }
-  await redis.hset(onboardingKey(userId), flat);
-  await redis.expire(onboardingKey(userId), TTL_24H);
+  const key = onboardingKey(userId);
+  const pipeline = redis.pipeline();
+  pipeline.hset(key, flat);
+  pipeline.expire(key, TTL_24H);
+  await pipeline.exec();
 }
 
 export async function deleteOnboardingState(userId: string): Promise<void> {

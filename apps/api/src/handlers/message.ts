@@ -5,12 +5,11 @@ import {
   getConversationMessages,
   getDailyLog,
   getStreak,
-  getUser,
   getWaterLog,
   recallAllMemories,
   saveConversationMessages,
 } from "@caltext/db";
-import type { AgentContext } from "@caltext/shared";
+import type { AgentContext, UserProfile } from "@caltext/shared";
 import { getLocaleName, localDateString } from "@caltext/shared";
 import { pruneMessages } from "ai";
 import type { RequestLogger } from "evlog";
@@ -44,21 +43,20 @@ function stripImagesFromHistory(messages: ModelMessage[]): ModelMessage[] {
 
 export async function handleMessage(
   log: RequestLogger,
-  userId: string,
+  user: UserProfile,
   text: string,
   imageUrl?: string,
 ): Promise<string | null> {
-  const [user, rawHistory] = await Promise.all([
-    getUser(userId),
-    getConversationMessages(userId) as Promise<ModelMessage[]>,
-  ]);
-  const conversationHistory = stripImagesFromHistory(rawHistory);
-  if (!user) throw new Error(`User not found: ${userId}`);
-
-  const localDate = localDateString(user.timezone);
-  const [memories, streak, todayLog, todayWater] = await Promise.all([
+  const userId = user.id;
+  const [rawHistory, memories, streak] = await Promise.all([
+    getConversationMessages<ModelMessage>(userId),
     recallAllMemories(userId),
     getStreak(userId),
+  ]);
+  const conversationHistory = stripImagesFromHistory(rawHistory);
+
+  const localDate = localDateString(user.timezone);
+  const [todayLog, todayWater] = await Promise.all([
     getDailyLog(userId, localDate),
     getWaterLog(userId, localDate),
   ]);

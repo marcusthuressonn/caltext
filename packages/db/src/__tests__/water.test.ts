@@ -12,6 +12,18 @@ const mockRedis = {
   hgetall: mock((key: string) => {
     return Promise.resolve(waterStore[key] ?? null);
   }),
+  pipeline: () => {
+    const ops: (() => Promise<unknown>)[] = [];
+    const p = {
+      hincrbyfloat(key: string, field: string, value: number) {
+        ops.push(() => mockRedis.hincrbyfloat(key, field, value));
+        return p;
+      },
+      expire() { return p; },
+      exec: () => Promise.all(ops.map((fn) => fn())),
+    };
+    return p;
+  },
 };
 
 mock.module("../client", () => ({
