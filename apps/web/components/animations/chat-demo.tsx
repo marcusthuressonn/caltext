@@ -25,7 +25,6 @@ type ScenarioData = {
 
 const SF_FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif";
 const SF_DISPLAY = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif";
-const BRAND_SERIF_FONT = "var(--font-jakarta), system-ui, sans-serif";
 const LOCK_SCREEN_GRADIENT =
   "linear-gradient(165deg, #c4bbb0 0%, #a69e93 35%, #8a7f73 65%, #5e544c 100%)";
 const HIDE_SCROLLBAR_CSS = `
@@ -122,7 +121,6 @@ function useClientNow(): Date | null {
   return now;
 }
 
-
 function getMealMoment(date: Date): MealMoment {
   const hour = date.getHours();
 
@@ -198,14 +196,20 @@ function AppIconSquare({ size = 38, borderRadius = 10 }: { size?: number; border
         justifyContent: "center",
       }}
     >
-      <svg width={iconSize} height={iconSize} viewBox="-1 -1 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="19.1" cy="4.9" r="2.3" fill="white"/>
-        <circle cx="12" cy="2" r="2.3" fill="white"/>
-        <circle cx="4.9" cy="4.9" r="2.3" fill="white"/>
-        <circle cx="2" cy="12" r="2.3" fill="white"/>
-        <circle cx="4.9" cy="19.1" r="2.3" fill="white"/>
-        <circle cx="12" cy="22" r="2.3" fill="white"/>
-        <circle cx="19.1" cy="19.1" r="2.3" fill="white"/>
+      <svg
+        width={iconSize}
+        height={iconSize}
+        viewBox="-1 -1 26 26"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="19.1" cy="4.9" r="2.3" fill="white" />
+        <circle cx="12" cy="2" r="2.3" fill="white" />
+        <circle cx="4.9" cy="4.9" r="2.3" fill="white" />
+        <circle cx="2" cy="12" r="2.3" fill="white" />
+        <circle cx="4.9" cy="19.1" r="2.3" fill="white" />
+        <circle cx="12" cy="22" r="2.3" fill="white" />
+        <circle cx="19.1" cy="19.1" r="2.3" fill="white" />
       </svg>
     </div>
   );

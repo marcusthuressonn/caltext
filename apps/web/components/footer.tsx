@@ -70,7 +70,9 @@ export function Footer() {
     <footer className="w-full border-t border-border py-10 sm:py-12">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 text-center">
         <div className="space-y-1">
-          <div className="font-body text-lg font-semibold tracking-[-0.02em] text-primary">{t("logo")}</div>
+          <div className="font-body text-lg font-semibold tracking-[-0.02em] text-primary">
+            {t("logo")}
+          </div>
           <p className="text-[13px] text-secondary">{t("tagline")}</p>
         </div>
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { LucideIcon } from "lucide-react";
 import { BellRing, Camera, ChartColumn } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { LucideIcon } from "lucide-react";
 
 export type ChatDemoScenario = "snapOrText" | "dailySummaries" | "smartReminders";
 

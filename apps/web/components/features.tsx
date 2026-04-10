@@ -31,9 +31,7 @@ export function Features() {
         <div className="mt-14 grid gap-6">
           {FEATURE_KEYS.map((key) => (
             <div key={key} className="rounded-2xl border border-border bg-bg p-6">
-              <h3 className="font-heading text-xl font-bold text-primary">
-                {t(`${key}.title`)}
-              </h3>
+              <h3 className="font-heading text-xl font-bold text-primary">{t(`${key}.title`)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-secondary">
                 {t(`${key}.description`)}
               </p>
