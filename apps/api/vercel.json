@@ -2,6 +2,6 @@
   "regions": ["iad1", "fra1", "hnd1"],
   "installCommand": "",
   "buildCommand": "cd ../.. && turbo build --filter=@caltext/api",
-  "ignoreCommand": "exit 0",
+  "ignoreCommand": "npx turbo-ignore @caltext/api",
   "bunVersion": "1.x"
 }
