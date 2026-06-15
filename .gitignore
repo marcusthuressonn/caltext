@@ -10,3 +10,4 @@ bun.lock
 .DS_Store
 .workflow-data/
 .swc
+.vercel
